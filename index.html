@@ -8,6 +8,7 @@
     />
     <title>Grammar Trainer</title>
     <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://accounts.google.com/gsi/client" async></script>
     <link
       href="https://fonts.googleapis.com/css2?family=Fredoka:wght@400;600;700;900&display=swap"
       rel="stylesheet"
@@ -590,8 +591,7 @@
       import {
         getAuth,
         GoogleAuthProvider,
-        signInWithRedirect,
-        getRedirectResult,
+        signInWithCredential,
         signInAnonymously,
       } from "https://www.gstatic.com/firebasejs/13.1.0/firebase-auth.js";
       import {
@@ -1649,33 +1649,104 @@
       };
       let wrongQsBank = [];
 
-      // Initialization
-      async function initApp() {
-        try {
-          const redirectResult = await getRedirectResult(auth);
-          if (redirectResult?.user) {
-            currentUser = redirectResult.user;
-            await finishInit();
+      const GOOGLE_CLIENT_ID =
+        "903392346710-junp9am49fd99p2ssr4nnpu61kngv75m.apps.googleusercontent.com";
+      const originalLoginHtml = document.getElementById("login-screen").innerHTML;
+      let googleTokenClient = null;
+
+      function whenGoogleReady() {
+        return new Promise((resolve, reject) => {
+          if (window.google?.accounts?.oauth2) {
+            resolve();
             return;
           }
-          showScreen("login-screen");
+          const started = Date.now();
+          const timer = setInterval(() => {
+            if (window.google?.accounts?.oauth2) {
+              clearInterval(timer);
+              resolve();
+            } else if (Date.now() - started > 10000) {
+              clearInterval(timer);
+              reject(new Error("Google sign-in script did not load"));
+            }
+          }, 50);
+        });
+      }
+
+      function restoreLoginScreen() {
+        const loginScreen = document.getElementById("login-screen");
+        loginScreen.innerHTML = originalLoginHtml;
+        showScreen("login-screen");
+      }
+
+      async function handleGoogleToken(response) {
+        if (!response?.access_token) {
+          restoreLoginScreen();
+          if (response?.error === "access_denied") return;
+          console.error("Google auth error:", response);
+          alert("Login failed. Please verify your Firebase configuration.");
+          return;
+        }
+
+        const loginScreen = document.getElementById("login-screen");
+        loginScreen.innerHTML =
+          `<div class="loading-spinner mb-4"></div><h2 class="text-2xl font-bold text-[var(--poke-blue)] header-font">Connecting to Lab...</h2>`;
+        showScreen("login-screen");
+        try {
+          const credential = GoogleAuthProvider.credential(
+            null,
+            response.access_token,
+          );
+          const userCredential = await signInWithCredential(auth, credential);
+          currentUser = userCredential.user;
+          await finishInit();
+        } catch (error) {
+          console.error("Firebase auth error:", error);
+          restoreLoginScreen();
+          alert("Login failed. Please verify your Firebase configuration.");
+        }
+      }
+
+      // Initialization
+      async function initApp() {
+        let googleSignInStarted = false;
+        try {
+          await whenGoogleReady();
+          googleTokenClient = google.accounts.oauth2.initTokenClient({
+            client_id: GOOGLE_CLIENT_ID,
+            scope: "openid email profile",
+            callback: (response) => {
+              googleSignInStarted = true;
+              handleGoogleToken(response);
+            },
+            error_callback: (error) => {
+              googleSignInStarted = true;
+              restoreLoginScreen();
+              if (error?.type === "popup_closed") return;
+              console.error("Google auth error:", error);
+              alert("Login failed. Please verify your Firebase configuration.");
+            },
+          });
+          if (!googleSignInStarted) showScreen("login-screen");
         } catch (error) {
           console.error("Initialization error:", error);
           showScreen("login-screen");
         }
       }
 
-      window.signInWithGoogle = async () => {
-        const provider = new GoogleAuthProvider();
+      window.signInWithGoogle = () => {
+        if (!googleTokenClient) {
+          alert("Login failed. Please verify your Firebase configuration.");
+          return;
+        }
         const loginScreen = document.getElementById("login-screen");
-        const previousHtml = loginScreen.innerHTML;
         loginScreen.innerHTML =
           `<div class="loading-spinner mb-4"></div><h2 class="text-2xl font-bold text-[var(--poke-blue)] header-font">Connecting to Lab...</h2>`;
         try {
-          await signInWithRedirect(auth, provider);
+          googleTokenClient.requestAccessToken();
         } catch (error) {
-          console.error("Firebase auth error:", error);
-          loginScreen.innerHTML = previousHtml;
+          console.error("Google auth error:", error);
+          restoreLoginScreen();
           alert("Login failed. Please verify your Firebase configuration.");
         }
       };
