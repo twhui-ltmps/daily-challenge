@@ -608,13 +608,13 @@
       // Your web app's Firebase configuration
       // For Firebase JS SDK v7.20.0 and later, measurementId is optional
       const firebaseConfig = {
-        apiKey: "AIzaSyCY2lO3ptr2nl1Oz84V-nzF-lZ_rDqsyPQ",
-        authDomain: "daily-challenge-95fd3.firebaseapp.com",
-        projectId: "daily-challenge-95fd3",
-        storageBucket: "daily-challenge-95fd3.firebasestorage.app",
-        messagingSenderId: "903392346710",
-        appId: "1:903392346710:web:6a937762f9492acb1371f7",
-        measurementId: "G-5GDBV1EGN8",
+        apiKey: "AIzaSyDUODAImoAOc-o9sgOrhOYz1kImZcg3cqI",
+        authDomain: "test-7f93c.firebaseapp.com",
+        projectId: "test-7f93c",
+        storageBucket: "test-7f93c.firebasestorage.app",
+        messagingSenderId: "623171860819",
+        appId: "1:623171860819:web:587304c09b0e8bfcebc9a6",
+        measurementId: "G-S68W1EQDYS",
       };
 
       // Initialize Firebase
@@ -1651,7 +1651,8 @@
 
       const GOOGLE_CLIENT_ID =
         "903392346710-junp9am49fd99p2ssr4nnpu61kngv75m.apps.googleusercontent.com";
-      const originalLoginHtml = document.getElementById("login-screen").innerHTML;
+      const originalLoginHtml =
+        document.getElementById("login-screen").innerHTML;
       let googleTokenClient = null;
 
       function whenGoogleReady() {
@@ -1689,8 +1690,7 @@
         }
 
         const loginScreen = document.getElementById("login-screen");
-        loginScreen.innerHTML =
-          `<div class="loading-spinner mb-4"></div><h2 class="text-2xl font-bold text-[var(--poke-blue)] header-font">Connecting to Lab...</h2>`;
+        loginScreen.innerHTML = `<div class="loading-spinner mb-4"></div><h2 class="text-2xl font-bold text-[var(--poke-blue)] header-font">Connecting to Lab...</h2>`;
         showScreen("login-screen");
         try {
           const credential = GoogleAuthProvider.credential(
@@ -1740,8 +1740,7 @@
           return;
         }
         const loginScreen = document.getElementById("login-screen");
-        loginScreen.innerHTML =
-          `<div class="loading-spinner mb-4"></div><h2 class="text-2xl font-bold text-[var(--poke-blue)] header-font">Connecting to Lab...</h2>`;
+        loginScreen.innerHTML = `<div class="loading-spinner mb-4"></div><h2 class="text-2xl font-bold text-[var(--poke-blue)] header-font">Connecting to Lab...</h2>`;
         try {
           googleTokenClient.requestAccessToken();
         } catch (error) {
