@@ -8,7 +8,6 @@
     />
     <title>Grammar Trainer</title>
     <script src="https://cdn.tailwindcss.com"></script>
-    <script src="https://accounts.google.com/gsi/client" async defer></script>
     <link
       href="https://fonts.googleapis.com/css2?family=Fredoka:wght@400;600;700;900&display=swap"
       rel="stylesheet"
@@ -366,10 +365,9 @@
         <p class="text-lg font-semibold text-gray-600 text-center mb-8">
           Sign in to save your EXP and rank!
         </p>
-        <div
-          id="google-btn-container"
-          class="flex justify-center min-h-[50px] mb-6"
-        ></div>
+        <button class="btn mb-6" onclick="signInWithGoogle()">
+          Continue with Google
+        </button>
         <button
           class="text-gray-500 underline text-sm mt-4 hover:text-black font-semibold"
           onclick="finishInitAsGuest()"
@@ -592,7 +590,8 @@
       import {
         getAuth,
         GoogleAuthProvider,
-        signInWithCredential,
+        signInWithRedirect,
+        getRedirectResult,
         signInAnonymously,
       } from "https://www.gstatic.com/firebasejs/13.1.0/firebase-auth.js";
       import {
@@ -1650,70 +1649,36 @@
       };
       let wrongQsBank = [];
 
-      // Google Auth Parsing Helper
-      function parseJwt(token) {
-        try {
-          return JSON.parse(
-            decodeURIComponent(
-              window
-                .atob(token.split(".")[1].replace(/-/g, "+").replace(/_/g, "/"))
-                .split("")
-                .map(function (c) {
-                  return "%" + ("00" + c.charCodeAt(0).toString(16)).slice(-2);
-                })
-                .join(""),
-            ),
-          );
-        } catch (e) {
-          return null;
-        }
-      }
-
       // Initialization
       async function initApp() {
         try {
-          // Show login screen for Google Sign-In before proceeding to the game
+          const redirectResult = await getRedirectResult(auth);
+          if (redirectResult?.user) {
+            currentUser = redirectResult.user;
+            await finishInit();
+            return;
+          }
           showScreen("login-screen");
-          google.accounts.id.initialize({
-            client_id:
-              "903392346710-junp9am49fd99p2ssr4nnpu61kngv75m.apps.googleusercontent.com",
-            callback: handleGoogleLogin,
-          });
-          google.accounts.id.renderButton(
-            document.getElementById("google-btn-container"),
-            {
-              theme: "filled_black",
-              size: "large",
-              shape: "pill",
-              width: 250,
-              text: "continue_with",
-            },
-          );
         } catch (error) {
           console.error("Initialization error:", error);
-          document.getElementById("loading-screen").innerHTML =
-            `<h2 class="text-red-500 font-bold">Error loading app. Please refresh.</h2>`;
+          showScreen("login-screen");
         }
       }
 
-      async function handleGoogleLogin(response) {
-        document.getElementById("login-screen").innerHTML =
+      window.signInWithGoogle = async () => {
+        const provider = new GoogleAuthProvider();
+        const loginScreen = document.getElementById("login-screen");
+        const previousHtml = loginScreen.innerHTML;
+        loginScreen.innerHTML =
           `<div class="loading-spinner mb-4"></div><h2 class="text-2xl font-bold text-[var(--poke-blue)] header-font">Connecting to Lab...</h2>`;
         try {
-          // Authenticate with Firebase using the Google credential
-          const credential = GoogleAuthProvider.credential(response.credential);
-          const userCredential = await signInWithCredential(auth, credential);
-          currentUser = userCredential.user;
-
-          const payload = parseJwt(response.credential);
-          window.googleUserPayload = payload;
-          finishInit();
+          await signInWithRedirect(auth, provider);
         } catch (error) {
           console.error("Firebase auth error:", error);
+          loginScreen.innerHTML = previousHtml;
           alert("Login failed. Please verify your Firebase configuration.");
-          window.location.reload();
         }
-      }
+      };
 
       window.finishInitAsGuest = async () => {
         document.getElementById("login-screen").innerHTML =
@@ -1731,7 +1696,6 @@
             uid: "local_guest_" + Math.random().toString(36).substring(2, 9),
           };
         }
-        window.googleUserPayload = null;
         finishInit();
       };
 
@@ -1740,15 +1704,16 @@
         await loadUserProfile();
 
         // Apply Google account info if signed in
-        if (window.googleUserPayload) {
+        if (currentUser && (currentUser.displayName || currentUser.email)) {
           if (!userProfile.nickname || userProfile.nickname === "Traveler") {
-            userProfile.nickname =
-              window.googleUserPayload.given_name ||
-              window.googleUserPayload.name ||
-              "Trainer";
+            userProfile.nickname = currentUser.displayName || "Trainer";
           }
-          userProfile.email = window.googleUserPayload.email;
+          if (currentUser.email) {
+            userProfile.email = currentUser.email;
+          }
           try {
+            const profileUpdate = { nickname: userProfile.nickname };
+            if (userProfile.email) profileUpdate.email = userProfile.email;
             await updateDoc(
               doc(
                 db,
@@ -1759,10 +1724,7 @@
                 "profile",
                 "main",
               ),
-              {
-                nickname: userProfile.nickname,
-                email: userProfile.email,
-              },
+              profileUpdate,
             );
           } catch (e) {
             console.warn(
