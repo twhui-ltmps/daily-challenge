@@ -318,17 +318,31 @@
 
         <!-- Leaderboard Screen -->
         <div id="leaderboard-screen" class="screen">
-            <div class="flex items-center justify-between mb-6">
+            <div class="flex items-center justify-between mb-4">
                 <h2 class="text-3xl font-bold text-[var(--poke-blue)] header-font">Hall of Fame</h2>
                 <button class="bg-gray-100 hover:bg-gray-200 text-gray-800 font-bold p-2 px-3 border-2 border-black rounded-full shadow-[0_2px_0_0_rgba(30,41,59,1)]" onclick="returnToMenu()">✖</button>
             </div>
             
+            <div class="flex items-center justify-between bg-gray-50 border-3 border-black rounded-xl p-3 mb-4 shadow-[0_3px_0_0_rgba(30,41,59,1)]">
+                <label class="font-bold text-gray-700">Filter Grade:</label>
+                <select id="leaderboard-grade-filter" onchange="showLeaderboard()" class="border-2 border-black rounded-lg px-3 py-1 font-bold text-gray-800 focus:outline-none">
+                    <option value="ALL">🌟 All Grades</option>
+                    <option value="P1">Primary 1 (P1)</option>
+                    <option value="P2">Primary 2 (P2)</option>
+                    <option value="P3">Primary 3 (P3)</option>
+                    <option value="P4" selected>Primary 4 (P4)</option>
+                    <option value="P5">Primary 5 (P5)</option>
+                    <option value="P6">Primary 6 (P6)</option>
+                </select>
+            </div>
+
             <div class="bg-white border-3 border-black rounded-xl overflow-hidden mb-4 max-h-[300px] overflow-y-auto shadow-[0_4px_0_0_rgba(30,41,59,1)]">
                 <table class="w-full text-left border-collapse">
                     <thead class="bg-gray-100 text-gray-700 border-b-3 border-black sticky top-0">
                         <tr>
                             <th class="p-3 font-bold text-center w-16">Rank</th>
                             <th class="p-3 font-bold">Trainer</th>
+                            <th class="p-3 font-bold text-center">Grade</th>
                             <th class="p-3 font-bold text-right">EXP ✨</th>
                         </tr>
                     </thead>
@@ -2413,10 +2427,10 @@
                 }
                 userProfile.email = window.googleUserPayload.email;
                 try {
-                    await updateDoc(doc(db, 'artifacts', appId, 'users', currentUser.uid, 'profile', 'main'), { 
+                    await setDoc(doc(db, 'artifacts', appId, 'users', currentUser.uid, 'profile', 'main'), { 
                         nickname: userProfile.nickname, 
                         email: userProfile.email 
-                    });
+                    }, { merge: true });
                 } catch(e) {}
             }
 
@@ -2435,16 +2449,15 @@
                 if (docSnap.exists()) {
                     userProfile = docSnap.data();
                 } else {
-                    userProfile = { nickname: '', totalScore: 0, lastCompletionDate: '' };
+                    userProfile = { nickname: '', totalScore: 0, lastCompletionDate: '', grade: 'P4' };
                     await setDoc(profileRef, userProfile);
                 }
             } catch (e) {
-                userProfile = { nickname: 'Guest Trainer', totalScore: 0, lastCompletionDate: '' };
+                userProfile = { nickname: 'Guest Trainer', totalScore: 0, lastCompletionDate: '', grade: 'P4' };
             }
         }
 
         async function loadWrongQuestions() {
-            // Fix Review Center: Load from localStorage first as reliable fallback
             const localWrong = localStorage.getItem('grammar_wrong_qs');
             if (localWrong) {
                 try { wrongQsBank = JSON.parse(localWrong); } catch(e) { wrongQsBank = []; }
@@ -2500,6 +2513,9 @@
 
         function updateMenuUI() {
             document.getElementById('menu-score').innerText = userProfile.totalScore || 0;
+            if (userProfile.grade) {
+                document.getElementById('grade-select').value = userProfile.grade;
+            }
             if (window.googleUserPayload) {
                 document.getElementById('login-section').classList.add('hidden');
             } else {
@@ -2538,6 +2554,11 @@
             sessionScore = 0;
             sessionCorrect = 0;
             currentIndex = 0;
+            
+            // Sync selected grade with profile
+            const selectedGrade = document.getElementById('grade-select').value;
+            userProfile.grade = selectedGrade;
+
             currentQuestions = generateQuestionsForMode(mode);
             
             if (currentQuestions.length === 0) {
@@ -2554,13 +2575,14 @@
             let selected = [];
             const selectedGrade = document.getElementById('grade-select').value; // P1 - P6
             const isChallengeMode = document.getElementById('challenge-mode').checked;
-            const limit = 10; // Always 10 questions
+            const limit = 10;
             
             if (mode === 'daily') {
-                // Filter question pool by grade
                 let pool = QUESTION_BANK.filter(q => q.grade === selectedGrade);
+                if (pool.length === 0) {
+                    pool = QUESTION_BANK; 
+                }
                 
-                // Adaptive Learning: Pick up to 4 from wrong bank associated with THIS grade
                 let gradeWrong = wrongQsBank.map(w => pool.find(q => q.id === w.questionId)).filter(Boolean);
                 selected = gradeWrong.slice(0, 4);
                 
@@ -2710,25 +2732,32 @@
 
             if (currentMode === 'daily') {
                 const today = new Date().toISOString().split('T')[0];
+                const selectedGrade = document.getElementById('grade-select').value;
                 userProfile.lastCompletionDate = today;
                 userProfile.totalScore = (userProfile.totalScore || 0) + sessionScore;
+                userProfile.grade = selectedGrade;
                 
                 try {
                     const profileRef = doc(db, 'artifacts', appId, 'users', currentUser.uid, 'profile', 'main');
-                    await updateDoc(profileRef, {
+                    await setDoc(profileRef, {
                         lastCompletionDate: today,
-                        totalScore: userProfile.totalScore
-                    });
+                        totalScore: userProfile.totalScore,
+                        grade: selectedGrade,
+                        nickname: userProfile.nickname || "Trainer"
+                    }, { merge: true });
 
                     if(userProfile.nickname) {
                         const lbRef = doc(db, 'artifacts', appId, 'public', 'data', 'leaderboard', currentUser.uid);
                         await setDoc(lbRef, {
                             name: userProfile.nickname,
                             score: userProfile.totalScore,
+                            grade: selectedGrade,
                             lastPlayed: today
-                        });
+                        }, { merge: true });
                     }
-                } catch(e) {}
+                } catch(e) {
+                    console.error("Error saving score:", e);
+                }
             }
             
             checkDailyStatus();
@@ -2738,7 +2767,8 @@
         window.showLeaderboard = async () => {
             showScreen('leaderboard-screen');
             const tbody = document.getElementById('leaderboard-body');
-            tbody.innerHTML = `<tr><td colspan="3" class="text-center p-4 text-gray-500">Loading scores...</td></tr>`;
+            const gradeFilter = document.getElementById('leaderboard-grade-filter').value;
+            tbody.innerHTML = `<tr><td colspan="4" class="text-center p-4 text-gray-500">Loading scores... ⏳</td></tr>`;
             
             try {
                 const lbCol = collection(db, 'artifacts', appId, 'public', 'data', 'leaderboard');
@@ -2746,11 +2776,15 @@
                 let players = [];
                 snap.forEach(doc => players.push(doc.data()));
                 
+                if (gradeFilter !== "ALL") {
+                    players = players.filter(p => p.grade === gradeFilter);
+                }
+
                 players.sort((a, b) => b.score - a.score);
                 
                 tbody.innerHTML = '';
                 if(players.length === 0) {
-                    tbody.innerHTML = `<tr><td colspan="3" class="text-center p-4 text-gray-500">No scores yet! Be the first!</td></tr>`;
+                    tbody.innerHTML = `<tr><td colspan="4" class="text-center p-4 text-gray-500">No scores found for this grade yet!</td></tr>`;
                     return;
                 }
 
@@ -2764,14 +2798,15 @@
                     tr.className = "border-b border-gray-200 hover:bg-gray-50";
                     tr.innerHTML = `
                         <td class="p-3 text-center font-bold text-lg text-gray-800">${rankBadge}</td>
-                        <td class="p-3 font-semibold text-gray-700 truncate max-w-[150px]">${p.name || 'Trainer'}</td>
+                        <td class="p-3 font-semibold text-gray-700 truncate max-w-[130px]">${p.name || 'Trainer'}</td>
+                        <td class="p-3 text-center font-bold text-gray-500">${p.grade || 'P4'}</td>
                         <td class="p-3 text-right font-bold text-[var(--poke-blue)]">${p.score} ✨</td>
                     `;
                     tbody.appendChild(tr);
                 });
             } catch (err) {
-                console.error(err);
-                tbody.innerHTML = `<tr><td colspan="3" class="text-center p-4 text-red-500">Failed to load leaderboard.</td></tr>`;
+                console.error("Leaderboard Fetch Error:", err);
+                tbody.innerHTML = `<tr><td colspan="4" class="text-center p-4 text-red-500">Failed to load leaderboard. Check console (F12) for index link.</td></tr>`;
             }
         };
 
