@@ -5,7 +5,6 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>Grammar Trainer</title>
     <script src="https://cdn.tailwindcss.com"></script>
-    <script src="https://accounts.google.com/gsi/client" async defer></script>
     <link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@400;600;700;900&display=swap" rel="stylesheet">
     
     <style>
@@ -222,39 +221,33 @@
             </div>
 
             <!-- Login Container on Main Menu -->
-            <div id="login-section" class="mb-4 text-center">
+            <div id="login-section" class="mb-4 text-center hidden">
                 <p class="text-sm font-semibold text-gray-600 mb-2">Sign in to save your EXP and rank!</p>
-                <div id="google-btn-container" class="flex justify-center min-h-[40px]"></div>
+                <button onclick="signInWithGoogle()" class="bg-white border-2 border-gray-300 text-gray-700 font-bold py-2 px-6 rounded-full shadow-[0_3px_0_0_rgba(209,213,219,1)] hover:bg-gray-50 flex items-center justify-center gap-2 mx-auto w-[250px] transition-transform active:translate-y-1 active:shadow-none">
+                    <svg class="w-5 h-5" viewBox="0 0 48 48"><path fill="#EA4335" d="M24 9.5c3.54 0 6.71 1.22 9.21 3.6l6.85-6.85C35.9 2.38 30.47 0 24 0 14.62 0 6.51 5.38 2.56 13.22l7.98 6.19C12.43 13.72 17.74 9.5 24 9.5z"/><path fill="#4285F4" d="M46.98 24.55c0-1.57-.15-3.09-.38-4.55H24v9.02h12.94c-.58 2.96-2.26 5.48-4.78 7.18l7.73 6c4.51-4.18 7.09-10.36 7.09-17.65z"/><path fill="#FBBC05" d="M10.53 28.59c-.48-1.45-.76-2.99-.76-4.59s.27-3.14.76-4.59l-7.98-6.19C.92 16.46 0 20.12 0 24c0 3.88.92 7.54 2.56 10.78l7.97-6.19z"/><path fill="#34A853" d="M24 48c6.48 0 11.93-2.13 15.89-5.81l-7.73-6c-2.15 1.45-4.92 2.3-8.16 2.3-6.26 0-11.57-4.22-13.47-9.91l-7.98 6.19C6.51 42.62 14.62 48 24 48z"/></svg>
+                    Continue with Google
+                </button>
             </div>
 
             <!-- Training Configuration -->
-            <div class="bg-gray-50 border-3 border-black rounded-xl p-4 mb-4 shadow-[0_4px_0_0_rgba(30,41,59,1)]">
-                <h3 class="font-bold text-gray-800 mb-2">Training Settings:</h3>
-                <div class="flex flex-col gap-3">
-                    <div class="flex items-center justify-between">
-                        <label class="font-semibold text-gray-700">Primary Class:</label>
-                        <select id="grade-select" class="border-2 border-black rounded-lg px-2 py-1 font-bold text-gray-800 focus:outline-none">
-                            <option value="P1">Primary 1 (P1)</option>
-                            <option value="P2">Primary 2 (P2)</option>
-                            <option value="P3">Primary 3 (P3)</option>
-                            <option value="P4" selected>Primary 4 (P4)</option>
-                            <option value="P5">Primary 5 (P5)</option>
-                            <option value="P6">Primary 6 (P6)</option>
-                        </select>
-                    </div>
-                    <div class="flex items-center justify-between">
-                        <label class="font-semibold text-[var(--poke-red-dark)]">Higher Ability Mode:</label>
-                        <input type="checkbox" id="challenge-mode" class="w-5 h-5 accent-[var(--poke-red)] border-2 border-black cursor-pointer">
-                    </div>
-                </div>
+            <div class="bg-gray-50 border-3 border-black rounded-xl p-4 mb-4 shadow-[0_4px_0_0_rgba(30,41,59,1)] flex items-center justify-between">
+                <label class="font-bold text-gray-700 text-lg">Select Level:</label>
+                <select id="level-select" class="border-3 border-[var(--poke-blue-dark)] rounded-xl px-4 py-2 font-bold text-[var(--poke-blue-dark)] bg-white focus:outline-none cursor-pointer text-lg" onchange="updateTrainingInfo()">
+                    <option value="1">Primary 1 (P1)</option>
+                    <option value="2">Primary 2 (P2)</option>
+                    <option value="3">Primary 3 (P3)</option>
+                    <option value="4" selected>Primary 4 (P4)</option>
+                    <option value="5">Primary 5 (P5)</option>
+                    <option value="6">Primary 6 (P6)</option>
+                </select>
             </div>
 
             <div class="flex flex-col gap-4">
                 <button id="btn-daily" class="btn" onclick="startMode('daily')">
-                    🎒 Daily Catch (<span id="daily-q-count">10</span> Qs)
+                    🎒 Daily Catch (10 Qs)
                 </button>
                 <p id="daily-status" class="text-center text-sm font-bold text-[var(--poke-green)] -mt-2 mb-2 hidden">
-                    ✅ Daily training complete! Rest up for tomorrow.
+                    ✅ Daily training complete!
                 </p>
 
                 <button id="btn-review" class="btn btn-red relative" onclick="startMode('review')">
@@ -318,31 +311,17 @@
 
         <!-- Leaderboard Screen -->
         <div id="leaderboard-screen" class="screen">
-            <div class="flex items-center justify-between mb-4">
+            <div class="flex items-center justify-between mb-6">
                 <h2 class="text-3xl font-bold text-[var(--poke-blue)] header-font">Hall of Fame</h2>
                 <button class="bg-gray-100 hover:bg-gray-200 text-gray-800 font-bold p-2 px-3 border-2 border-black rounded-full shadow-[0_2px_0_0_rgba(30,41,59,1)]" onclick="returnToMenu()">✖</button>
             </div>
             
-            <div class="flex items-center justify-between bg-gray-50 border-3 border-black rounded-xl p-3 mb-4 shadow-[0_3px_0_0_rgba(30,41,59,1)]">
-                <label class="font-bold text-gray-700">Filter Grade:</label>
-                <select id="leaderboard-grade-filter" onchange="showLeaderboard()" class="border-2 border-black rounded-lg px-3 py-1 font-bold text-gray-800 focus:outline-none">
-                    <option value="ALL">🌟 All Grades</option>
-                    <option value="P1">Primary 1 (P1)</option>
-                    <option value="P2">Primary 2 (P2)</option>
-                    <option value="P3">Primary 3 (P3)</option>
-                    <option value="P4" selected>Primary 4 (P4)</option>
-                    <option value="P5">Primary 5 (P5)</option>
-                    <option value="P6">Primary 6 (P6)</option>
-                </select>
-            </div>
-
             <div class="bg-white border-3 border-black rounded-xl overflow-hidden mb-4 max-h-[300px] overflow-y-auto shadow-[0_4px_0_0_rgba(30,41,59,1)]">
                 <table class="w-full text-left border-collapse">
                     <thead class="bg-gray-100 text-gray-700 border-b-3 border-black sticky top-0">
                         <tr>
                             <th class="p-3 font-bold text-center w-16">Rank</th>
                             <th class="p-3 font-bold">Trainer</th>
-                            <th class="p-3 font-bold text-center">Grade</th>
                             <th class="p-3 font-bold text-right">EXP ✨</th>
                         </tr>
                     </thead>
@@ -358,9 +337,10 @@
     <!-- Firebase SDKs -->
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/11.0.1/firebase-app.js";
-        import { getAuth, signInAnonymously, GoogleAuthProvider, signInWithCredential } from "https://www.gstatic.com/firebasejs/11.0.1/firebase-auth.js";
+        import { getAuth, signInAnonymously, GoogleAuthProvider, signInWithPopup, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/11.0.1/firebase-auth.js";
         import { getFirestore, doc, getDoc, setDoc, updateDoc, collection, getDocs, deleteDoc } from "https://www.gstatic.com/firebasejs/11.0.1/firebase-firestore.js";
 
+        // Your Exact Firebase Configuration
         const firebaseConfig = {
             apiKey: "AIzaSyDUODAImoAOc-o9sgOrhOYz1kImZcg3cqI",
             authDomain: "test-7f93c.firebaseapp.com",
@@ -381,1970 +361,170 @@
         let userProfile = null;
         let wrongQsBank = []; 
 
-        const QUESTION_BANK = [
-    {
-        "id": "t1",
-        "type": "Tenses",
-        "level": 1,
-        "text": "I ___ to the park yesterday.",
-        "ans": "went",
-        "choices": [
-            "go",
-            "goes",
-            "went",
-            "gone"
-        ],
-        "grade": "P1"
-    },
-    {
-        "id": "t2",
-        "type": "Tenses",
-        "level": 1,
-        "text": "She ___ breakfast every morning.",
-        "ans": "eats",
-        "choices": [
-            "eat",
-            "eats",
-            "ate",
-            "eating"
-        ],
-        "grade": "P1"
-    },
-    {
-        "id": "t3",
-        "type": "Tenses",
-        "level": 2,
-        "text": "They ___ a movie right now.",
-        "ans": "are watching",
-        "choices": [
-            "watch",
-            "watched",
-            "are watching",
-            "have watched"
-        ],
-        "grade": "P1"
-    },
-    {
-        "id": "t4",
-        "type": "Tenses",
-        "level": 2,
-        "text": "I ___ my homework already.",
-        "ans": "have finished",
-        "choices": [
-            "finish",
-            "finished",
-            "have finished",
-            "am finishing"
-        ],
-        "grade": "P1"
-    },
-    {
-        "id": "t5",
-        "type": "Tenses",
-        "level": 1,
-        "text": "We ___ to Japan next year.",
-        "ans": "will go",
-        "choices": [
-            "go",
-            "went",
-            "will go",
-            "have gone"
-        ],
-        "grade": "P1"
-    },
-    {
-        "id": "t6",
-        "type": "Tenses",
-        "level": 2,
-        "text": "He ___ when the phone rang.",
-        "ans": "was sleeping",
-        "choices": [
-            "sleeps",
-            "slept",
-            "was sleeping",
-            "has slept"
-        ],
-        "grade": "P1"
-    },
-    {
-        "id": "t7",
-        "type": "Tenses",
-        "level": 2,
-        "text": "It ___ since morning.",
-        "ans": "has been raining",
-        "choices": [
-            "rains",
-            "rained",
-            "is raining",
-            "has been raining"
-        ],
-        "grade": "P1"
-    },
-    {
-        "id": "t8",
-        "type": "Tenses",
-        "level": 2,
-        "text": "The bus ___ before we arrived.",
-        "ans": "had left",
-        "choices": [
-            "left",
-            "leaves",
-            "has left",
-            "had left"
-        ],
-        "grade": "P1"
-    },
-    {
-        "id": "t9",
-        "type": "Tenses",
-        "level": 1,
-        "text": "Look! The dog ___ towards us.",
-        "ans": "is running",
-        "choices": [
-            "runs",
-            "ran",
-            "is running",
-            "has run"
-        ],
-        "grade": "P1"
-    },
-    {
-        "id": "t10",
-        "type": "Tenses",
-        "level": 2,
-        "text": "Water ___ at 100 degrees Celsius.",
-        "ans": "boils",
-        "choices": [
-            "boil",
-            "boils",
-            "is boiling",
-            "boiled"
-        ],
-        "grade": "P1"
-    },
-    {
-        "id": "t11",
-        "type": "Tenses",
-        "level": 2,
-        "text": "I ___ him since last week.",
-        "ans": "haven't seen",
-        "choices": [
-            "don't see",
-            "didn't see",
-            "haven't seen",
-            "am not seeing"
-        ],
-        "grade": "P1"
-    },
-    {
-        "id": "t12",
-        "type": "Tenses",
-        "level": 1,
-        "text": "Tomorrow, I ___ my grandparents.",
-        "ans": "am going to visit",
-        "choices": [
-            "visit",
-            "visited",
-            "have visited",
-            "am going to visit"
-        ],
-        "grade": "P1"
-    },
-    {
-        "id": "t13",
-        "type": "Tenses",
-        "level": 2,
-        "text": "By the time you arrive, I ___ cooking.",
-        "ans": "will have finished",
-        "choices": [
-            "finish",
-            "finished",
-            "will have finished",
-            "am finishing"
-        ],
-        "grade": "P1"
-    },
-    {
-        "id": "t14",
-        "type": "Tenses",
-        "level": 2,
-        "text": "While I was reading, my brother ___.",
-        "ans": "was playing",
-        "choices": [
-            "plays",
-            "played",
-            "was playing",
-            "has played"
-        ],
-        "grade": "P1"
-    },
-    {
-        "id": "t15",
-        "type": "Tenses",
-        "level": 1,
-        "text": "Do you ___ to school every day?",
-        "ans": "walk",
-        "choices": [
-            "walk",
-            "walks",
-            "walked",
-            "walking"
-        ],
-        "grade": "P1"
-    },
-    {
-        "id": "t16",
-        "type": "Tenses",
-        "level": 1,
-        "text": "She ___ her keys yesterday.",
-        "ans": "lost",
-        "choices": [
-            "lose",
-            "loses",
-            "lost",
-            "is losing"
-        ],
-        "grade": "P1"
-    },
-    {
-        "id": "t17",
-        "type": "Tenses",
-        "level": 2,
-        "text": "They ___ in this house for ten years.",
-        "ans": "have lived",
-        "choices": [
-            "live",
-            "lived",
-            "have lived",
-            "are living"
-        ],
-        "grade": "P1"
-    },
-    {
-        "id": "t18",
-        "type": "Tenses",
-        "level": 1,
-        "text": "The sun ___ in the east.",
-        "ans": "rises",
-        "choices": [
-            "rise",
-            "rises",
-            "rose",
-            "is rising"
-        ],
-        "grade": "P1"
-    },
-    {
-        "id": "t19",
-        "type": "Tenses",
-        "level": 1,
-        "text": "Next week, we ___ a party.",
-        "ans": "will have",
-        "choices": [
-            "have",
-            "had",
-            "will have",
-            "have had"
-        ],
-        "grade": "P1"
-    },
-    {
-        "id": "t20",
-        "type": "Tenses",
-        "level": 1,
-        "text": "I usually ___ up at 7 AM.",
-        "ans": "wake",
-        "choices": [
-            "wake",
-            "wakes",
-            "woke",
-            "waking"
-        ],
-        "grade": "P1"
-    },
-    {
-        "id": "p1",
-        "type": "Prepositions",
-        "level": 1,
-        "text": "Are you afraid ___ the dark?",
-        "ans": "of",
-        "choices": [
-            "at",
-            "of",
-            "to",
-            "in"
-        ],
-        "grade": "P2"
-    },
-    {
-        "id": "p2",
-        "type": "Prepositions",
-        "level": 1,
-        "text": "She is very good ___ drawing.",
-        "ans": "at",
-        "choices": [
-            "in",
-            "at",
-            "with",
-            "on"
-        ],
-        "grade": "P2"
-    },
-    {
-        "id": "p3",
-        "type": "Prepositions",
-        "level": 1,
-        "text": "Don't be mean ___ your classmates.",
-        "ans": "to",
-        "choices": [
-            "with",
-            "for",
-            "to",
-            "about"
-        ],
-        "grade": "P2"
-    },
-    {
-        "id": "p4",
-        "type": "Prepositions",
-        "level": 2,
-        "text": "I entirely agree ___ you.",
-        "ans": "with",
-        "choices": [
-            "to",
-            "with",
-            "on",
-            "about"
-        ],
-        "grade": "P2"
-    },
-    {
-        "id": "p5",
-        "type": "Prepositions",
-        "level": 2,
-        "text": "The room was full ___ old furniture.",
-        "ans": "of",
-        "choices": [
-            "with",
-            "of",
-            "in",
-            "from"
-        ],
-        "grade": "P2"
-    },
-    {
-        "id": "p6",
-        "type": "Prepositions",
-        "level": 1,
-        "text": "They are talking ___ the new movie.",
-        "ans": "about",
-        "choices": [
-            "of",
-            "on",
-            "about",
-            "for"
-        ],
-        "grade": "P2"
-    },
-    {
-        "id": "p7",
-        "type": "Prepositions",
-        "level": 2,
-        "text": "He apologized ___ being late.",
-        "ans": "for",
-        "choices": [
-            "of",
-            "to",
-            "for",
-            "about"
-        ],
-        "grade": "P2"
-    },
-    {
-        "id": "p8",
-        "type": "Prepositions",
-        "level": 1,
-        "text": "She was smiling ___ me.",
-        "ans": "at",
-        "choices": [
-            "to",
-            "with",
-            "at",
-            "for"
-        ],
-        "grade": "P2"
-    },
-    {
-        "id": "p9",
-        "type": "Prepositions",
-        "level": 2,
-        "text": "Are you interested ___ history?",
-        "ans": "in",
-        "choices": [
-            "on",
-            "in",
-            "about",
-            "with"
-        ],
-        "grade": "P2"
-    },
-    {
-        "id": "p10",
-        "type": "Prepositions",
-        "level": 2,
-        "text": "He is responsible ___ the project.",
-        "ans": "for",
-        "choices": [
-            "to",
-            "for",
-            "with",
-            "of"
-        ],
-        "grade": "P2"
-    },
-    {
-        "id": "p11",
-        "type": "Prepositions",
-        "level": 2,
-        "text": "I am looking forward ___ the weekend.",
-        "ans": "to",
-        "choices": [
-            "for",
-            "at",
-            "to",
-            "on"
-        ],
-        "grade": "P2"
-    },
-    {
-        "id": "p12",
-        "type": "Prepositions",
-        "level": 1,
-        "text": "The cat is hiding ___ the bed.",
-        "ans": "under",
-        "choices": [
-            "under",
-            "over",
-            "in",
-            "through"
-        ],
-        "grade": "P2"
-    },
-    {
-        "id": "p13",
-        "type": "Prepositions",
-        "level": 1,
-        "text": "We always go to the beach ___ summer.",
-        "ans": "in",
-        "choices": [
-            "in",
-            "on",
-            "at",
-            "by"
-        ],
-        "grade": "P2"
-    },
-    {
-        "id": "p14",
-        "type": "Prepositions",
-        "level": 1,
-        "text": "My birthday is ___ May 5th.",
-        "ans": "on",
-        "choices": [
-            "in",
-            "on",
-            "at",
-            "from"
-        ],
-        "grade": "P2"
-    },
-    {
-        "id": "p15",
-        "type": "Prepositions",
-        "level": 1,
-        "text": "Let's meet ___ 3 o'clock.",
-        "ans": "at",
-        "choices": [
-            "in",
-            "on",
-            "at",
-            "for"
-        ],
-        "grade": "P2"
-    },
-    {
-        "id": "p16",
-        "type": "Prepositions",
-        "level": 2,
-        "text": "He walked ___ the bridge to cross the river.",
-        "ans": "across",
-        "choices": [
-            "across",
-            "through",
-            "under",
-            "in"
-        ],
-        "grade": "P2"
-    },
-    {
-        "id": "p17",
-        "type": "Prepositions",
-        "level": 1,
-        "text": "The picture hangs ___ the wall.",
-        "ans": "on",
-        "choices": [
-            "in",
-            "on",
-            "at",
-            "over"
-        ],
-        "grade": "P2"
-    },
-    {
-        "id": "p18",
-        "type": "Prepositions",
-        "level": 1,
-        "text": "I received a letter ___ my pen pal.",
-        "ans": "from",
-        "choices": [
-            "to",
-            "from",
-            "with",
-            "by"
-        ],
-        "grade": "P3"
-    },
-    {
-        "id": "p19",
-        "type": "Prepositions",
-        "level": 2,
-        "text": "She prefers tea ___ coffee.",
-        "ans": "to",
-        "choices": [
-            "than",
-            "from",
-            "to",
-            "with"
-        ],
-        "grade": "P2"
-    },
-    {
-        "id": "p20",
-        "type": "Prepositions",
-        "level": 2,
-        "text": "The train travels ___ a tunnel.",
-        "ans": "through",
-        "choices": [
-            "across",
-            "through",
-            "over",
-            "on"
-        ],
-        "grade": "P2"
-    },
-    {
-        "id": "qw1",
-        "type": "Question Words",
-        "level": 1,
-        "text": "___ is your name? - I am John.",
-        "ans": "What",
-        "choices": [
-            "Who",
-            "What",
-            "How",
-            "Where"
-        ],
-        "grade": "P3"
-    },
-    {
-        "id": "qw2",
-        "type": "Question Words",
-        "level": 1,
-        "text": "___ do you live? - In London.",
-        "ans": "Where",
-        "choices": [
-            "What",
-            "When",
-            "Where",
-            "Why"
-        ],
-        "grade": "P3"
-    },
-    {
-        "id": "qw3",
-        "type": "Question Words",
-        "level": 1,
-        "text": "___ is that boy? - He is my brother.",
-        "ans": "Who",
-        "choices": [
-            "Who",
-            "Whose",
-            "Whom",
-            "Which"
-        ],
-        "grade": "P3"
-    },
-    {
-        "id": "qw4",
-        "type": "Question Words",
-        "level": 1,
-        "text": "___ time does the class start? - At 8 AM.",
-        "ans": "What",
-        "choices": [
-            "When",
-            "How",
-            "What",
-            "Which"
-        ],
-        "grade": "P3"
-    },
-    {
-        "id": "qw5",
-        "type": "Question Words",
-        "level": 1,
-        "text": "___ did you arrive late? - Because I missed the bus.",
-        "ans": "Why",
-        "choices": [
-            "How",
-            "Why",
-            "When",
-            "What"
-        ],
-        "grade": "P3"
-    },
-    {
-        "id": "qw6",
-        "type": "Question Words",
-        "level": 1,
-        "text": "___ old are you? - I am ten years old.",
-        "ans": "How",
-        "choices": [
-            "What",
-            "When",
-            "How",
-            "Who"
-        ],
-        "grade": "P3"
-    },
-    {
-        "id": "qw7",
-        "type": "Question Words",
-        "level": 2,
-        "text": "___ book is this? - It is mine.",
-        "ans": "Whose",
-        "choices": [
-            "Who",
-            "Whose",
-            "Which",
-            "What"
-        ],
-        "grade": "P2"
-    },
-    {
-        "id": "qw8",
-        "type": "Question Words",
-        "level": 1,
-        "text": "___ do you go to school? - By bus.",
-        "ans": "How",
-        "choices": [
-            "Where",
-            "Why",
-            "How",
-            "When"
-        ],
-        "grade": "P3"
-    },
-    {
-        "id": "qw9",
-        "type": "Question Words",
-        "level": 2,
-        "text": "___ one do you prefer, red or blue? - The red one.",
-        "ans": "Which",
-        "choices": [
-            "What",
-            "Which",
-            "Whose",
-            "How"
-        ],
-        "grade": "P3"
-    },
-    {
-        "id": "qw10",
-        "type": "Question Words",
-        "level": 1,
-        "text": "___ many apples do you want? - Three, please.",
-        "ans": "How",
-        "choices": [
-            "What",
-            "How",
-            "Why",
-            "Which"
-        ],
-        "grade": "P3"
-    },
-    {
-        "id": "qw11",
-        "type": "Question Words",
-        "level": 1,
-        "text": "___ much does this cost? - Five dollars.",
-        "ans": "How",
-        "choices": [
-            "What",
-            "How",
-            "Why",
-            "Where"
-        ],
-        "grade": "P3"
-    },
-    {
-        "id": "qw12",
-        "type": "Question Words",
-        "level": 1,
-        "text": "___ is your birthday? - It's in July.",
-        "ans": "When",
-        "choices": [
-            "Where",
-            "What",
-            "When",
-            "How"
-        ],
-        "grade": "P4"
-    },
-    {
-        "id": "qw13",
-        "type": "Question Words",
-        "level": 1,
-        "text": "___ did you buy at the store? - Some milk.",
-        "ans": "What",
-        "choices": [
-            "Why",
-            "Where",
-            "Who",
-            "What"
-        ],
-        "grade": "P4"
-    },
-    {
-        "id": "qw14",
-        "type": "Question Words",
-        "level": 1,
-        "text": "___ is knocking at the door? - It's Peter.",
-        "ans": "Who",
-        "choices": [
-            "Who",
-            "Whose",
-            "Which",
-            "What"
-        ],
-        "grade": "P4"
-    },
-    {
-        "id": "qw15",
-        "type": "Question Words",
-        "level": 2,
-        "text": "___ often do you exercise? - Every day.",
-        "ans": "How",
-        "choices": [
-            "How",
-            "What",
-            "When",
-            "Why"
-        ],
-        "grade": "P3"
-    },
-    {
-        "id": "qw16",
-        "type": "Question Words",
-        "level": 1,
-        "text": "___ color is your new car? - It's black.",
-        "ans": "What",
-        "choices": [
-            "How",
-            "Which",
-            "What",
-            "Where"
-        ],
-        "grade": "P4"
-    },
-    {
-        "id": "qw17",
-        "type": "Question Words",
-        "level": 1,
-        "text": "___ did she cry? - Because she was sad.",
-        "ans": "Why",
-        "choices": [
-            "How",
-            "Why",
-            "When",
-            "Who"
-        ],
-        "grade": "P4"
-    },
-    {
-        "id": "qw18",
-        "type": "Question Words",
-        "level": 1,
-        "text": "___ are my shoes? - Under the bed.",
-        "ans": "Where",
-        "choices": [
-            "Why",
-            "Where",
-            "When",
-            "What"
-        ],
-        "grade": "P4"
-    },
-    {
-        "id": "qw19",
-        "type": "Question Words",
-        "level": 2,
-        "text": "___ of these pens works? - The blue one.",
-        "ans": "Which",
-        "choices": [
-            "Who",
-            "Which",
-            "What",
-            "How"
-        ],
-        "grade": "P3"
-    },
-    {
-        "id": "qw20",
-        "type": "Question Words",
-        "level": 2,
-        "text": "___ far is the station? - About two miles.",
-        "ans": "How",
-        "choices": [
-            "How",
-            "Where",
-            "What",
-            "Why"
-        ],
-        "grade": "P3"
-    },
-    {
-        "id": "pr1",
-        "type": "Proofreading",
-        "level": 1,
-        "text": "She <u>don't</u> like playing tennis.",
-        "ans": "doesn't",
-        "choices": [
-            "doesn't",
-            "didn't",
-            "isn't",
-            "aren't"
-        ],
-        "grade": "P4"
-    },
-    {
-        "id": "pr2",
-        "type": "Proofreading",
-        "level": 1,
-        "text": "I <u>goes</u> to school every day.",
-        "ans": "go",
-        "choices": [
-            "go",
-            "went",
-            "going",
-            "gone"
-        ],
-        "grade": "P4"
-    },
-    {
-        "id": "pr3",
-        "type": "Proofreading",
-        "level": 1,
-        "text": "They <u>was</u> very happy yesterday.",
-        "ans": "were",
-        "choices": [
-            "were",
-            "are",
-            "is",
-            "will be"
-        ],
-        "grade": "P4"
-    },
-    {
-        "id": "pr4",
-        "type": "Proofreading",
-        "level": 2,
-        "text": "He has <u>wrote</u> a letter.",
-        "ans": "written",
-        "choices": [
-            "written",
-            "write",
-            "writes",
-            "writing"
-        ],
-        "grade": "P3"
-    },
-    {
-        "id": "pr5",
-        "type": "Proofreading",
-        "level": 2,
-        "text": "The dog hurt <u>it's</u> paw.",
-        "ans": "its",
-        "choices": [
-            "its",
-            "it",
-            "itself",
-            "its'"
-        ],
-        "grade": "P3"
-    },
-    {
-        "id": "pr6",
-        "type": "Proofreading",
-        "level": 1,
-        "text": "There <u>is</u> many apples in the basket.",
-        "ans": "are",
-        "choices": [
-            "are",
-            "was",
-            "were",
-            "be"
-        ],
-        "grade": "P4"
-    },
-    {
-        "id": "pr7",
-        "type": "Proofreading",
-        "level": 1,
-        "text": "She can <u>speaks</u> English well.",
-        "ans": "speak",
-        "choices": [
-            "speak",
-            "spoke",
-            "spoken",
-            "speaking"
-        ],
-        "grade": "P5"
-    },
-    {
-        "id": "pr8",
-        "type": "Proofreading",
-        "level": 2,
-        "text": "I look forward to <u>see</u> you.",
-        "ans": "seeing",
-        "choices": [
-            "seeing",
-            "saw",
-            "seen",
-            "sees"
-        ],
-        "grade": "P3"
-    },
-    {
-        "id": "pr9",
-        "type": "Proofreading",
-        "level": 2,
-        "text": "He is taller <u>then</u> me.",
-        "ans": "than",
-        "choices": [
-            "than",
-            "that",
-            "there",
-            "though"
-        ],
-        "grade": "P3"
-    },
-    {
-        "id": "pr10",
-        "type": "Proofreading",
-        "level": 1,
-        "text": "We didn't <u>went</u> to the park.",
-        "ans": "go",
-        "choices": [
-            "go",
-            "going",
-            "gone",
-            "goes"
-        ],
-        "grade": "P5"
-    },
-    {
-        "id": "pr11",
-        "type": "Proofreading",
-        "level": 2,
-        "text": "This is <u>more better</u> than that.",
-        "ans": "better",
-        "choices": [
-            "better",
-            "best",
-            "good",
-            "well"
-        ],
-        "grade": "P3"
-    },
-    {
-        "id": "pr12",
-        "type": "Proofreading",
-        "level": 1,
-        "text": "She <u>readed</u> the book quickly.",
-        "ans": "read",
-        "choices": [
-            "read",
-            "reading",
-            "reads",
-            "red"
-        ],
-        "grade": "P5"
-    },
-    {
-        "id": "pr13",
-        "type": "Proofreading",
-        "level": 1,
-        "text": "Where <u>does</u> you live?",
-        "ans": "do",
-        "choices": [
-            "do",
-            "did",
-            "doing",
-            "done"
-        ],
-        "grade": "P5"
-    },
-    {
-        "id": "pr14",
-        "type": "Proofreading",
-        "level": 1,
-        "text": "The children are <u>play</u> outside.",
-        "ans": "playing",
-        "choices": [
-            "playing",
-            "plays",
-            "played",
-            "player"
-        ],
-        "grade": "P5"
-    },
-    {
-        "id": "pr15",
-        "type": "Proofreading",
-        "level": 1,
-        "text": "It <u>make</u> me very angry.",
-        "ans": "makes",
-        "choices": [
-            "makes",
-            "making",
-            "made",
-            "make's"
-        ],
-        "grade": "P5"
-    },
-    {
-        "id": "pr16",
-        "type": "Proofreading",
-        "level": 1,
-        "text": "I have <u>two sister</u>.",
-        "ans": "two sisters",
-        "choices": [
-            "two sisters",
-            "two sister's",
-            "a sisters",
-            "two brother"
-        ],
-        "grade": "P5"
-    },
-    {
-        "id": "pr17",
-        "type": "Proofreading",
-        "level": 2,
-        "text": "The news <u>are</u> good.",
-        "ans": "is",
-        "choices": [
-            "is",
-            "were",
-            "be",
-            "am"
-        ],
-        "grade": "P3"
-    },
-    {
-        "id": "pr18",
-        "type": "Proofreading",
-        "level": 2,
-        "text": "He doesn't have <u>no</u> money.",
-        "ans": "any",
-        "choices": [
-            "any",
-            "some",
-            "many",
-            "a"
-        ],
-        "grade": "P4"
-    },
-    {
-        "id": "pr19",
-        "type": "Proofreading",
-        "level": 2,
-        "text": "I enjoy <u>to read</u> books.",
-        "ans": "reading",
-        "choices": [
-            "reading",
-            "read",
-            "reads",
-            "reader"
-        ],
-        "grade": "P4"
-    },
-    {
-        "id": "pr20",
-        "type": "Proofreading",
-        "level": 1,
-        "text": "She bought <u>a</u> umbrella.",
-        "ans": "an",
-        "choices": [
-            "an",
-            "the",
-            "some",
-            "any"
-        ],
-        "grade": "P5"
-    },
-    {
-        "id": "sva1",
-        "type": "S-V Agreement",
-        "level": 2,
-        "text": "The list of items ___ on the desk.",
-        "ans": "is",
-        "choices": [
-            "is",
-            "are",
-            "were",
-            "be"
-        ],
-        "grade": "P4"
-    },
-    {
-        "id": "sva2",
-        "type": "S-V Agreement",
-        "level": 2,
-        "text": "A bouquet of yellow roses ___ color to the room.",
-        "ans": "lends",
-        "choices": [
-            "lends",
-            "lend",
-            "lending",
-            "are lending"
-        ],
-        "grade": "P4"
-    },
-    {
-        "id": "sva3",
-        "type": "S-V Agreement",
-        "level": 1,
-        "text": "My family ___ going on a vacation.",
-        "ans": "is",
-        "choices": [
-            "is",
-            "are",
-            "am",
-            "were"
-        ],
-        "grade": "P5"
-    },
-    {
-        "id": "sva4",
-        "type": "S-V Agreement",
-        "level": 2,
-        "text": "Neither the teacher nor the students ___ in the classroom.",
-        "ans": "are",
-        "choices": [
-            "are",
-            "is",
-            "was",
-            "has been"
-        ],
-        "grade": "P4"
-    },
-    {
-        "id": "sva5",
-        "type": "S-V Agreement",
-        "level": 2,
-        "text": "Either my father or my brothers ___ going to sell the house.",
-        "ans": "are",
-        "choices": [
-            "are",
-            "is",
-            "was",
-            "has"
-        ],
-        "grade": "P4"
-    },
-    {
-        "id": "sva6",
-        "type": "S-V Agreement",
-        "level": 2,
-        "text": "Every one of the shirts ___ a green collar.",
-        "ans": "has",
-        "choices": [
-            "has",
-            "have",
-            "having",
-            "are having"
-        ],
-        "grade": "P4"
-    },
-    {
-        "id": "sva7",
-        "type": "S-V Agreement",
-        "level": 1,
-        "text": "The dog or the cats ___ outside.",
-        "ans": "are",
-        "choices": [
-            "are",
-            "is",
-            "was",
-            "be"
-        ],
-        "grade": "P5"
-    },
-    {
-        "id": "sva8",
-        "type": "S-V Agreement",
-        "level": 2,
-        "text": "Each of the dancers ___ beautifully.",
-        "ans": "twirls",
-        "choices": [
-            "twirls",
-            "twirl",
-            "are twirling",
-            "twirling"
-        ],
-        "grade": "P4"
-    },
-    {
-        "id": "sva9",
-        "type": "S-V Agreement",
-        "level": 1,
-        "text": "Mathematics ___ my favorite subject.",
-        "ans": "is",
-        "choices": [
-            "is",
-            "are",
-            "were",
-            "be"
-        ],
-        "grade": "P6"
-    },
-    {
-        "id": "sva10",
-        "type": "S-V Agreement",
-        "level": 1,
-        "text": "The news ___ on at 6 PM.",
-        "ans": "is",
-        "choices": [
-            "is",
-            "are",
-            "were",
-            "be"
-        ],
-        "grade": "P6"
-    },
-    {
-        "id": "sva11",
-        "type": "S-V Agreement",
-        "level": 1,
-        "text": "Several of the sheep ___ sick.",
-        "ans": "are",
-        "choices": [
-            "are",
-            "is",
-            "was",
-            "has been"
-        ],
-        "grade": "P6"
-    },
-    {
-        "id": "sva12",
-        "type": "S-V Agreement",
-        "level": 2,
-        "text": "Nobody ___ the trouble I've seen.",
-        "ans": "knows",
-        "choices": [
-            "knows",
-            "know",
-            "knowing",
-            "are knowing"
-        ],
-        "grade": "P4"
-    },
-    {
-        "id": "sva13",
-        "type": "S-V Agreement",
-        "level": 1,
-        "text": "The scissors ___ on the table.",
-        "ans": "are",
-        "choices": [
-            "are",
-            "is",
-            "was",
-            "be"
-        ],
-        "grade": "P6"
-    },
-    {
-        "id": "sva14",
-        "type": "S-V Agreement",
-        "level": 2,
-        "text": "The police ___ coming to the house.",
-        "ans": "are",
-        "choices": [
-            "are",
-            "is",
-            "was",
-            "has"
-        ],
-        "grade": "P4"
-    },
-    {
-        "id": "sva15",
-        "type": "S-V Agreement",
-        "level": 1,
-        "text": "A lot of water ___ spilled.",
-        "ans": "was",
-        "choices": [
-            "was",
-            "were",
-            "are",
-            "have been"
-        ],
-        "grade": "P6"
-    },
-    {
-        "id": "sva16",
-        "type": "S-V Agreement",
-        "level": 2,
-        "text": "Half of the apples ___ rotten.",
-        "ans": "are",
-        "choices": [
-            "are",
-            "is",
-            "was",
-            "has been"
-        ],
-        "grade": "P5"
-    },
-    {
-        "id": "sva17",
-        "type": "S-V Agreement",
-        "level": 1,
-        "text": "The group of children ___ playing a game.",
-        "ans": "is",
-        "choices": [
-            "is",
-            "are",
-            "were",
-            "am"
-        ],
-        "grade": "P6"
-    },
-    {
-        "id": "sva18",
-        "type": "S-V Agreement",
-        "level": 1,
-        "text": "Both of my friends ___ coming to the party.",
-        "ans": "are",
-        "choices": [
-            "are",
-            "is",
-            "was",
-            "am"
-        ],
-        "grade": "P6"
-    },
-    {
-        "id": "sva19",
-        "type": "S-V Agreement",
-        "level": 2,
-        "text": "Somebody ___ left their bag here.",
-        "ans": "has",
-        "choices": [
-            "has",
-            "have",
-            "are",
-            "were"
-        ],
-        "grade": "P5"
-    },
-    {
-        "id": "sva20",
-        "type": "S-V Agreement",
-        "level": 2,
-        "text": "Fifty dollars ___ a lot of money to lose.",
-        "ans": "is",
-        "choices": [
-            "is",
-            "are",
-            "were",
-            "have been"
-        ],
-        "grade": "P5"
-    },
-    {
-        "id": "sp1",
-        "type": "Nouns",
-        "level": 2,
-        "text": "The farmer has three ___ on his farm.",
-        "ans": "sheep",
-        "choices": [
-            "sheep",
-            "sheeps",
-            "sheepes",
-            "shipe"
-        ],
-        "grade": "P5"
-    },
-    {
-        "id": "sp2",
-        "type": "Nouns",
-        "level": 1,
-        "text": "Brush your ___ before going to bed.",
-        "ans": "teeth",
-        "choices": [
-            "teeth",
-            "tooth",
-            "tooths",
-            "teeths"
-        ],
-        "grade": "P6"
-    },
-    {
-        "id": "sp3",
-        "type": "Nouns",
-        "level": 1,
-        "text": "There are many ___ playing in the park.",
-        "ans": "children",
-        "choices": [
-            "children",
-            "childs",
-            "childrens",
-            "child"
-        ],
-        "grade": "P6"
-    },
-    {
-        "id": "sp4",
-        "type": "Nouns",
-        "level": 2,
-        "text": "I caught two ___ in the river.",
-        "ans": "fish",
-        "choices": [
-            "fish",
-            "fishes",
-            "fishs",
-            "fishing"
-        ],
-        "grade": "P5"
-    },
-    {
-        "id": "sp5",
-        "type": "Nouns",
-        "level": 2,
-        "text": "The kitchen is full of little ___.",
-        "ans": "mice",
-        "choices": [
-            "mice",
-            "mouses",
-            "mouse",
-            "mices"
-        ],
-        "grade": "P5"
-    },
-    {
-        "id": "sp6",
-        "type": "Nouns",
-        "level": 2,
-        "text": "We need some ___ for the sandwiches.",
-        "ans": "loaves",
-        "choices": [
-            "loaves",
-            "loafs",
-            "loaf",
-            "loavs"
-        ],
-        "grade": "P5"
-    },
-    {
-        "id": "sp7",
-        "type": "Nouns",
-        "level": 1,
-        "text": "The trees lose their ___ in autumn.",
-        "ans": "leaves",
-        "choices": [
-            "leaves",
-            "leafs",
-            "leaf",
-            "leavs"
-        ],
-        "grade": "P6"
-    },
-    {
-        "id": "sp8",
-        "type": "Nouns",
-        "level": 1,
-        "text": "She has two ___ at home.",
-        "ans": "cats",
-        "choices": [
-            "cats",
-            "cat",
-            "cates",
-            "cats'"
-        ],
-        "grade": "P6"
-    },
-    {
-        "id": "sp9",
-        "type": "Nouns",
-        "level": 2,
-        "text": "Can you buy three ___ of bread?",
-        "ans": "loaves",
-        "choices": [
-            "loaves",
-            "loaf",
-            "loafs",
-            "loave"
-        ],
-        "grade": "P5"
-    },
-    {
-        "id": "sp10",
-        "type": "Nouns",
-        "level": 2,
-        "text": "The ___ are flying south for the winter.",
-        "ans": "geese",
-        "choices": [
-            "geese",
-            "gooses",
-            "goose",
-            "geeses"
-        ],
-        "grade": "P5"
-    },
-    {
-        "id": "sp11",
-        "type": "Nouns",
-        "level": 1,
-        "text": "He hurt both of his ___ running.",
-        "ans": "feet",
-        "choices": [
-            "feet",
-            "foot",
-            "foots",
-            "feets"
-        ],
-        "grade": "P6"
-    },
-    {
-        "id": "sp12",
-        "type": "Nouns",
-        "level": 2,
-        "text": "Look at those beautiful ___!",
-        "ans": "deer",
-        "choices": [
-            "deer",
-            "deers",
-            "deeres",
-            "dear"
-        ],
-        "grade": "P5"
-    },
-    {
-        "id": "sp13",
-        "type": "Nouns",
-        "level": 1,
-        "text": "How many ___ are attending the meeting?",
-        "ans": "people",
-        "choices": [
-            "people",
-            "person",
-            "persons",
-            "peoples"
-        ],
-        "grade": "P6"
-    },
-    {
-        "id": "sp14",
-        "type": "Nouns",
-        "level": 1,
-        "text": "We saw several ___ at the zoo.",
-        "ans": "monkeys",
-        "choices": [
-            "monkeys",
-            "monkies",
-            "monkey",
-            "monkeyes"
-        ],
-        "grade": "P6"
-    },
-    {
-        "id": "sp15",
-        "type": "Nouns",
-        "level": 1,
-        "text": "The shelf is full of old ___.",
-        "ans": "books",
-        "choices": [
-            "books",
-            "book",
-            "bookes",
-            "books'"
-        ],
-        "grade": "P6"
-    },
-    {
-        "id": "sp16",
-        "type": "Nouns",
-        "level": 2,
-        "text": "Please put the ___ on the table.",
-        "ans": "knives",
-        "choices": [
-            "knives",
-            "knifes",
-            "knife",
-            "knive"
-        ],
-        "grade": "P6"
-    },
-    {
-        "id": "sp17",
-        "type": "Nouns",
-        "level": 1,
-        "text": "I bought two ___ of pants.",
-        "ans": "pairs",
-        "choices": [
-            "pairs",
-            "pair",
-            "paires",
-            "pairing"
-        ],
-        "grade": "P6"
-    },
-    {
-        "id": "sp18",
-        "type": "Nouns",
-        "level": 1,
-        "text": "She packed three ___ for the trip.",
-        "ans": "boxes",
-        "choices": [
-            "boxes",
-            "box",
-            "boxs",
-            "boxe"
-        ],
-        "grade": "P6"
-    },
-    {
-        "id": "sp19",
-        "type": "Nouns",
-        "level": 1,
-        "text": "The city has many tall ___.",
-        "ans": "buildings",
-        "choices": [
-            "buildings",
-            "building",
-            "buildinges",
-            "build"
-        ],
-        "grade": "P6"
-    },
-    {
-        "id": "sp20",
-        "type": "Nouns",
-        "level": 1,
-        "text": "There are five ___ waiting for the bus.",
-        "ans": "women",
-        "choices": [
-            "women",
-            "woman",
-            "womans",
-            "womens"
-        ],
-        "grade": "P6"
-    },
-    {
-        "id": "pos1",
-        "type": "Part of Speech",
-        "level": 1,
-        "text": "She sings very ___.",
-        "ans": "beautifully",
-        "choices": [
-            "beautifully",
-            "beautiful",
-            "beauty",
-            "beautify"
-        ],
-        "grade": "P6"
-    },
-    {
-        "id": "pos2",
-        "type": "Part of Speech",
-        "level": 1,
-        "text": "He is a ___ driver.",
-        "ans": "careful",
-        "choices": [
-            "careful",
-            "carefully",
-            "care",
-            "cares"
-        ],
-        "grade": "P6"
-    },
-    {
-        "id": "pos3",
-        "type": "Part of Speech",
-        "level": 1,
-        "text": "They ran ___ to catch the train.",
-        "ans": "quickly",
-        "choices": [
-            "quickly",
-            "quick",
-            "quickness",
-            "quicker"
-        ],
-        "grade": "P6"
-    },
-    {
-        "id": "pos4",
-        "type": "Part of Speech",
-        "level": 2,
-        "text": "The ___ of the mountains took my breath away.",
-        "ans": "beauty",
-        "choices": [
-            "beauty",
-            "beautiful",
-            "beautifully",
-            "beautify"
-        ],
-        "grade": "P6"
-    },
-    {
-        "id": "pos5",
-        "type": "Part of Speech",
-        "level": 1,
-        "text": "Please speak ___, I can't hear you.",
-        "ans": "loudly",
-        "choices": [
-            "loudly",
-            "loud",
-            "loudness",
-            "aloud"
-        ],
-        "grade": "P6"
-    },
-    {
-        "id": "pos6",
-        "type": "Part of Speech",
-        "level": 1,
-        "text": "He gave me a ___ smile.",
-        "ans": "friendly",
-        "choices": [
-            "friendly",
-            "friend",
-            "friendliness",
-            "friendless"
-        ],
-        "grade": "P6"
-    },
-    {
-        "id": "pos7",
-        "type": "Part of Speech",
-        "level": 1,
-        "text": "The test was surprisingly ___.",
-        "ans": "easy",
-        "choices": [
-            "easy",
-            "easily",
-            "ease",
-            "easiest"
-        ],
-        "grade": "P6"
-    },
-    {
-        "id": "pos8",
-        "type": "Part of Speech",
-        "level": 1,
-        "text": "She handled the fragile glass ___.",
-        "ans": "carefully",
-        "choices": [
-            "carefully",
-            "careful",
-            "care",
-            "caring"
-        ],
-        "grade": "P6"
-    },
-    {
-        "id": "pos9",
-        "type": "Part of Speech",
-        "level": 2,
-        "text": "His ___ surprised everyone.",
-        "ans": "decision",
-        "choices": [
-            "decision",
-            "decide",
-            "decisive",
-            "decisively"
-        ],
-        "grade": "P6"
-    },
-    {
-        "id": "pos10",
-        "type": "Part of Speech",
-        "level": 2,
-        "text": "The cat slept ___ on the sofa.",
-        "ans": "peacefully",
-        "choices": [
-            "peacefully",
-            "peaceful",
-            "peace",
-            "peaces"
-        ],
-        "grade": "P6"
-    },
-    {
-        "id": "pos11",
-        "type": "Part of Speech",
-        "level": 2,
-        "text": "We need to ___ this room.",
-        "ans": "organize",
-        "choices": [
-            "organize",
-            "organization",
-            "organized",
-            "organizer"
-        ],
-        "grade": "P6"
-    },
-    {
-        "id": "pos12",
-        "type": "Part of Speech",
-        "level": 1,
-        "text": "That is a very ___ idea.",
-        "ans": "interesting",
-        "choices": [
-            "interesting",
-            "interest",
-            "interestingly",
-            "interested"
-        ],
-        "grade": "P6"
-    },
-    {
-        "id": "pos13",
-        "type": "Part of Speech",
-        "level": 1,
-        "text": "He looked at me ___.",
-        "ans": "angrily",
-        "choices": [
-            "angrily",
-            "angry",
-            "anger",
-            "angers"
-        ],
-        "grade": "P6"
-    },
-    {
-        "id": "pos14",
-        "type": "Part of Speech",
-        "level": 2,
-        "text": "The ___ was solved quickly by the detective.",
-        "ans": "mystery",
-        "choices": [
-            "mystery",
-            "mysterious",
-            "mysteriously",
-            "mysteries"
-        ],
-        "grade": "P6"
-    },
-    {
-        "id": "pos15",
-        "type": "Part of Speech",
-        "level": 2,
-        "text": "She is highly ___ in her field.",
-        "ans": "successful",
-        "choices": [
-            "successful",
-            "success",
-            "successfully",
-            "succeed"
-        ],
-        "grade": "P6"
-    },
-    {
-        "id": "pos16",
-        "type": "Part of Speech",
-        "level": 1,
-        "text": "I need some ___ with my homework.",
-        "ans": "help",
-        "choices": [
-            "help",
-            "helpful",
-            "helplessly",
-            "helped"
-        ],
-        "grade": "P6"
-    },
-    {
-        "id": "pos17",
-        "type": "Part of Speech",
-        "level": 1,
-        "text": "The sun is shining ___ today.",
-        "ans": "brightly",
-        "choices": [
-            "brightly",
-            "bright",
-            "brightness",
-            "brighter"
-        ],
-        "grade": "P6"
-    },
-    {
-        "id": "pos18",
-        "type": "Part of Speech",
-        "level": 1,
-        "text": "It is important to eat ___ food.",
-        "ans": "healthy",
-        "choices": [
-            "healthy",
-            "health",
-            "healthily",
-            "heal"
-        ],
-        "grade": "P6"
-    },
-    {
-        "id": "pos19",
-        "type": "Part of Speech",
-        "level": 2,
-        "text": "He accepted the award with ___.",
-        "ans": "pride",
-        "choices": [
-            "pride",
-            "proud",
-            "proudly",
-            "prided"
-        ],
-        "grade": "P6"
-    },
-    {
-        "id": "pos20",
-        "type": "Part of Speech",
-        "level": 1,
-        "text": "The music played ___ in the background.",
-        "ans": "softly",
-        "choices": [
-            "softly",
-            "soft",
-            "softness",
-            "soften"
-        ],
-        "grade": "P6"
-    }
-];
+        // 140 Questions (Will be mapped to P1-P6 dynamically below)
+        const RAW_QUESTION_BANK = [
+            // 1. Tenses (t1 - t20)
+            { id: 't1', type: 'Tenses', text: "I ___ to the park yesterday.", ans: "went", choices: ["go", "goes", "went", "gone"] },
+            { id: 't2', type: 'Tenses', text: "She ___ breakfast every morning.", ans: "eats", choices: ["eat", "eats", "ate", "eating"] },
+            { id: 't3', type: 'Tenses', text: "They ___ a movie right now.", ans: "are watching", choices: ["watch", "watched", "are watching", "have watched"] },
+            { id: 't4', type: 'Tenses', text: "I ___ my homework already.", ans: "have finished", choices: ["finish", "finished", "have finished", "am finishing"] },
+            { id: 't5', type: 'Tenses', text: "We ___ to Japan next year.", ans: "will go", choices: ["go", "went", "will go", "have gone"] },
+            { id: 't6', type: 'Tenses', text: "He ___ when the phone rang.", ans: "was sleeping", choices: ["sleeps", "slept", "was sleeping", "has slept"] },
+            { id: 't7', type: 'Tenses', text: "It ___ since morning.", ans: "has been raining", choices: ["rains", "rained", "is raining", "has been raining"] },
+            { id: 't8', type: 'Tenses', text: "The bus ___ before we arrived.", ans: "had left", choices: ["left", "leaves", "has left", "had left"] },
+            { id: 't9', type: 'Tenses', text: "Look! The dog ___ towards us.", ans: "is running", choices: ["runs", "ran", "is running", "has run"] },
+            { id: 't10', type: 'Tenses', text: "Water ___ at 100 degrees Celsius.", ans: "boils", choices: ["boil", "boils", "is boiling", "boiled"] },
+            { id: 't11', type: 'Tenses', text: "I ___ him since last week.", ans: "haven't seen", choices: ["don't see", "didn't see", "haven't seen", "am not seeing"] },
+            { id: 't12', type: 'Tenses', text: "Tomorrow, I ___ my grandparents.", ans: "am going to visit", choices: ["visit", "visited", "have visited", "am going to visit"] },
+            { id: 't13', type: 'Tenses', text: "By the time you arrive, I ___ cooking.", ans: "will have finished", choices: ["finish", "finished", "will have finished", "am finishing"] },
+            { id: 't14', type: 'Tenses', text: "While I was reading, my brother ___.", ans: "was playing", choices: ["plays", "played", "was playing", "has played"] },
+            { id: 't15', type: 'Tenses', text: "Do you ___ to school every day?", ans: "walk", choices: ["walk", "walks", "walked", "walking"] },
+            { id: 't16', type: 'Tenses', text: "She ___ her keys yesterday.", ans: "lost", choices: ["lose", "loses", "lost", "is losing"] },
+            { id: 't17', type: 'Tenses', text: "They ___ in this house for ten years.", ans: "have lived", choices: ["live", "lived", "have lived", "are living"] },
+            { id: 't18', type: 'Tenses', text: "The sun ___ in the east.", ans: "rises", choices: ["rise", "rises", "rose", "is rising"] },
+            { id: 't19', type: 'Tenses', text: "Next week, we ___ a party.", ans: "will have", choices: ["have", "had", "will have", "have had"] },
+            { id: 't20', type: 'Tenses', text: "I usually ___ up at 7 AM.", ans: "wake", choices: ["wake", "wakes", "woke", "waking"] },
 
-        // Background Icons
+            // 2. Prepositions (p1 - p20)
+            { id: 'p1', type: 'Prepositions', text: "Are you afraid ___ the dark?", ans: "of", choices: ["at", "of", "to", "in"] },
+            { id: 'p2', type: 'Prepositions', text: "She is very good ___ drawing.", ans: "at", choices: ["in", "at", "with", "on"] },
+            { id: 'p3', type: 'Prepositions', text: "Don't be mean ___ your classmates.", ans: "to", choices: ["with", "for", "to", "about"] },
+            { id: 'p4', type: 'Prepositions', text: "I entirely agree ___ you.", ans: "with", choices: ["to", "with", "on", "about"] },
+            { id: 'p5', type: 'Prepositions', text: "The room was full ___ old furniture.", ans: "of", choices: ["with", "of", "in", "from"] },
+            { id: 'p6', type: 'Prepositions', text: "They are talking ___ the new movie.", ans: "about", choices: ["of", "on", "about", "for"] },
+            { id: 'p7', type: 'Prepositions', text: "He apologized ___ being late.", ans: "for", choices: ["of", "to", "for", "about"] },
+            { id: 'p8', type: 'Prepositions', text: "She was smiling ___ me.", ans: "at", choices: ["to", "with", "at", "for"] },
+            { id: 'p9', type: 'Prepositions', text: "Are you interested ___ history?", ans: "in", choices: ["on", "in", "about", "with"] },
+            { id: 'p10', type: 'Prepositions', text: "He is responsible ___ the project.", ans: "for", choices: ["to", "for", "with", "of"] },
+            { id: 'p11', type: 'Prepositions', text: "I am looking forward ___ the weekend.", ans: "to", choices: ["for", "at", "to", "on"] },
+            { id: 'p12', type: 'Prepositions', text: "The cat is hiding ___ the bed.", ans: "under", choices: ["under", "over", "in", "through"] },
+            { id: 'p13', type: 'Prepositions', text: "We always go to the beach ___ summer.", ans: "in", choices: ["in", "on", "at", "by"] },
+            { id: 'p14', type: 'Prepositions', text: "My birthday is ___ May 5th.", ans: "on", choices: ["in", "on", "at", "from"] },
+            { id: 'p15', type: 'Prepositions', text: "Let's meet ___ 3 o'clock.", ans: "at", choices: ["in", "on", "at", "for"] },
+            { id: 'p16', type: 'Prepositions', text: "He walked ___ the bridge to cross the river.", ans: "across", choices: ["across", "through", "under", "in"] },
+            { id: 'p17', type: 'Prepositions', text: "The picture hangs ___ the wall.", ans: "on", choices: ["in", "on", "at", "over"] },
+            { id: 'p18', type: 'Prepositions', text: "I received a letter ___ my pen pal.", ans: "from", choices: ["to", "from", "with", "by"] },
+            { id: 'p19', type: 'Prepositions', text: "She prefers tea ___ coffee.", ans: "to", choices: ["than", "from", "to", "with"] },
+            { id: 'p20', type: 'Prepositions', text: "The train travels ___ a tunnel.", ans: "through", choices: ["across", "through", "over", "on"] },
+
+            // 3. Question Words (qw1 - qw20)
+            { id: 'qw1', type: 'Question Words', text: "___ is your name? - I am John.", ans: "What", choices: ["Who", "What", "How", "Where"] },
+            { id: 'qw2', type: 'Question Words', text: "___ do you live? - In London.", ans: "Where", choices: ["What", "When", "Where", "Why"] },
+            { id: 'qw3', type: 'Question Words', text: "___ is that boy? - He is my brother.", ans: "Who", choices: ["Who", "Whose", "Whom", "Which"] },
+            { id: 'qw4', type: 'Question Words', text: "___ time does the class start? - At 8 AM.", ans: "What", choices: ["When", "How", "What", "Which"] },
+            { id: 'qw5', type: 'Question Words', text: "___ did you arrive late? - Because I missed the bus.", ans: "Why", choices: ["How", "Why", "When", "What"] },
+            { id: 'qw6', type: 'Question Words', text: "___ old are you? - I am ten years old.", ans: "How", choices: ["What", "When", "How", "Who"] },
+            { id: 'qw7', type: 'Question Words', text: "___ book is this? - It is mine.", ans: "Whose", choices: ["Who", "Whose", "Which", "What"] },
+            { id: 'qw8', type: 'Question Words', text: "___ do you go to school? - By bus.", ans: "How", choices: ["Where", "Why", "How", "When"] },
+            { id: 'qw9', type: 'Question Words', text: "___ one do you prefer, red or blue? - The red one.", ans: "Which", choices: ["What", "Which", "Whose", "How"] },
+            { id: 'qw10', type: 'Question Words', text: "___ many apples do you want? - Three, please.", ans: "How", choices: ["What", "How", "Why", "Which"] },
+            { id: 'qw11', type: 'Question Words', text: "___ much does this cost? - Five dollars.", ans: "How", choices: ["What", "How", "Why", "Where"] },
+            { id: 'qw12', type: 'Question Words', text: "___ is your birthday? - It's in July.", ans: "When", choices: ["Where", "What", "When", "How"] },
+            { id: 'qw13', type: 'Question Words', text: "___ did you buy at the store? - Some milk.", ans: "What", choices: ["Why", "Where", "Who", "What"] },
+            { id: 'qw14', type: 'Question Words', text: "___ is knocking at the door? - It's Peter.", ans: "Who", choices: ["Who", "Whose", "Which", "What"] },
+            { id: 'qw15', type: 'Question Words', text: "___ often do you exercise? - Every day.", ans: "How", choices: ["How", "What", "When", "Why"] },
+            { id: 'qw16', type: 'Question Words', text: "___ color is your new car? - It's black.", ans: "What", choices: ["How", "Which", "What", "Where"] },
+            { id: 'qw17', type: 'Question Words', text: "___ did she cry? - Because she was sad.", ans: "Why", choices: ["How", "Why", "When", "Who"] },
+            { id: 'qw18', type: 'Question Words', text: "___ are my shoes? - Under the bed.", ans: "Where", choices: ["Why", "Where", "When", "What"] },
+            { id: 'qw19', type: 'Question Words', text: "___ of these pens works? - The blue one.", ans: "Which", choices: ["Who", "Which", "What", "How"] },
+            { id: 'qw20', type: 'Question Words', text: "___ far is the station? - About two miles.", ans: "How", choices: ["How", "Where", "What", "Why"] },
+
+            // 4. Proofreading (pr1 - pr20)
+            { id: 'pr1', type: 'Proofreading', text: "She <u>don't</u> like playing tennis.", ans: "doesn't", choices: ["doesn't", "didn't", "isn't", "aren't"] },
+            { id: 'pr2', type: 'Proofreading', text: "I <u>goes</u> to school every day.", ans: "go", choices: ["go", "went", "going", "gone"] },
+            { id: 'pr3', type: 'Proofreading', text: "They <u>was</u> very happy yesterday.", ans: "were", choices: ["were", "are", "is", "will be"] },
+            { id: 'pr4', type: 'Proofreading', text: "He has <u>wrote</u> a letter.", ans: "written", choices: ["written", "write", "writes", "writing"] },
+            { id: 'pr5', type: 'Proofreading', text: "The dog hurt <u>it's</u> paw.", ans: "its", choices: ["its", "it", "itself", "its'"] },
+            { id: 'pr6', type: 'Proofreading', text: "There <u>is</u> many apples in the basket.", ans: "are", choices: ["are", "was", "were", "be"] },
+            { id: 'pr7', type: 'Proofreading', text: "She can <u>speaks</u> English well.", ans: "speak", choices: ["speak", "spoke", "spoken", "speaking"] },
+            { id: 'pr8', type: 'Proofreading', text: "I look forward to <u>see</u> you.", ans: "seeing", choices: ["seeing", "saw", "seen", "sees"] },
+            { id: 'pr9', type: 'Proofreading', text: "He is taller <u>then</u> me.", ans: "than", choices: ["than", "that", "there", "though"] },
+            { id: 'pr10', type: 'Proofreading', text: "We didn't <u>went</u> to the park.", ans: "go", choices: ["go", "going", "gone", "goes"] },
+            { id: 'pr11', type: 'Proofreading', text: "This is <u>more better</u> than that.", ans: "better", choices: ["better", "best", "good", "well"] },
+            { id: 'pr12', type: 'Proofreading', text: "She <u>readed</u> the book quickly.", ans: "read", choices: ["read", "reading", "reads", "red"] },
+            { id: 'pr13', type: 'Proofreading', text: "Where <u>does</u> you live?", ans: "do", choices: ["do", "did", "doing", "done"] },
+            { id: 'pr14', type: 'Proofreading', text: "The children are <u>play</u> outside.", ans: "playing", choices: ["playing", "plays", "played", "player"] },
+            { id: 'pr15', type: 'Proofreading', text: "It <u>make</u> me very angry.", ans: "makes", choices: ["makes", "making", "made", "make's"] },
+            { id: 'pr16', type: 'Proofreading', text: "I have <u>two sister</u>.", ans: "two sisters", choices: ["two sisters", "two sister's", "a sisters", "two brother"] },
+            { id: 'pr17', type: 'Proofreading', text: "The news <u>are</u> good.", ans: "is", choices: ["is", "were", "be", "am"] },
+            { id: 'pr18', type: 'Proofreading', text: "He doesn't have <u>no</u> money.", ans: "any", choices: ["any", "some", "many", "a"] },
+            { id: 'pr19', type: 'Proofreading', text: "I enjoy <u>to read</u> books.", ans: "reading", choices: ["reading", "read", "reads", "reader"] },
+            { id: 'pr20', type: 'Proofreading', text: "She bought <u>a</u> umbrella.", ans: "an", choices: ["an", "the", "some", "any"] },
+
+            // 5. Subject Verb Agreement (sva1 - sva20)
+            { id: 'sva1', type: 'S-V Agreement', text: "The list of items ___ on the desk.", ans: "is", choices: ["is", "are", "were", "be"] },
+            { id: 'sva2', type: 'S-V Agreement', text: "A bouquet of yellow roses ___ color to the room.", ans: "lends", choices: ["lends", "lend", "lending", "are lending"] },
+            { id: 'sva3', type: 'S-V Agreement', text: "My family ___ going on a vacation.", ans: "is", choices: ["is", "are", "am", "were"] },
+            { id: 'sva4', type: 'S-V Agreement', text: "Neither the teacher nor the students ___ in the classroom.", ans: "are", choices: ["are", "is", "was", "has been"] },
+            { id: 'sva5', type: 'S-V Agreement', text: "Either my father or my brothers ___ going to sell the house.", ans: "are", choices: ["are", "is", "was", "has"] },
+            { id: 'sva6', type: 'S-V Agreement', text: "Every one of the shirts ___ a green collar.", ans: "has", choices: ["has", "have", "having", "are having"] },
+            { id: 'sva7', type: 'S-V Agreement', text: "The dog or the cats ___ outside.", ans: "are", choices: ["are", "is", "was", "be"] },
+            { id: 'sva8', type: 'S-V Agreement', text: "Each of the dancers ___ beautifully.", ans: "twirls", choices: ["twirls", "twirl", "are twirling", "twirling"] },
+            { id: 'sva9', type: 'S-V Agreement', text: "Mathematics ___ my favorite subject.", ans: "is", choices: ["is", "are", "were", "be"] },
+            { id: 'sva10', type: 'S-V Agreement', text: "The news ___ on at 6 PM.", ans: "is", choices: ["is", "are", "were", "be"] },
+            { id: 'sva11', type: 'S-V Agreement', text: "Several of the sheep ___ sick.", ans: "are", choices: ["are", "is", "was", "has been"] },
+            { id: 'sva12', type: 'S-V Agreement', text: "Nobody ___ the trouble I've seen.", ans: "knows", choices: ["knows", "know", "knowing", "are knowing"] },
+            { id: 'sva13', type: 'S-V Agreement', text: "The scissors ___ on the table.", ans: "are", choices: ["are", "is", "was", "be"] },
+            { id: 'sva14', type: 'S-V Agreement', text: "The police ___ coming to the house.", ans: "are", choices: ["are", "is", "was", "has"] },
+            { id: 'sva15', type: 'S-V Agreement', text: "A lot of water ___ spilled.", ans: "was", choices: ["was", "were", "are", "have been"] },
+            { id: 'sva16', type: 'S-V Agreement', text: "Half of the apples ___ rotten.", ans: "are", choices: ["are", "is", "was", "has been"] },
+            { id: 'sva17', type: 'S-V Agreement', text: "The group of children ___ playing a game.", ans: "is", choices: ["is", "are", "were", "am"] },
+            { id: 'sva18', type: 'S-V Agreement', text: "Both of my friends ___ coming to the party.", ans: "are", choices: ["are", "is", "was", "am"] },
+            { id: 'sva19', type: 'S-V Agreement', text: "Somebody ___ left their bag here.", ans: "has", choices: ["has", "have", "are", "were"] },
+            { id: 'sva20', type: 'S-V Agreement', text: "Fifty dollars ___ a lot of money to lose.", ans: "is", choices: ["is", "are", "were", "have been"] },
+
+            // 6. Singular & Plural Nouns (sp1 - sp20)
+            { id: 'sp1', type: 'Nouns', text: "The farmer has three ___ on his farm.", ans: "sheep", choices: ["sheep", "sheeps", "sheepes", "shipe"] },
+            { id: 'sp2', type: 'Nouns', text: "Brush your ___ before going to bed.", ans: "teeth", choices: ["teeth", "tooth", "tooths", "teeths"] },
+            { id: 'sp3', type: 'Nouns', text: "There are many ___ playing in the park.", ans: "children", choices: ["children", "childs", "childrens", "child"] },
+            { id: 'sp4', type: 'Nouns', text: "I caught two ___ in the river.", ans: "fish", choices: ["fish", "fishes", "fishs", "fishing"] },
+            { id: 'sp5', type: 'Nouns', text: "The kitchen is full of little ___.", ans: "mice", choices: ["mice", "mouses", "mouse", "mices"] },
+            { id: 'sp6', type: 'Nouns', text: "We need some ___ for the sandwiches.", ans: "loaves", choices: ["loaves", "loafs", "loaf", "loavs"] },
+            { id: 'sp7', type: 'Nouns', text: "The trees lose their ___ in autumn.", ans: "leaves", choices: ["leaves", "leafs", "leaf", "leavs"] },
+            { id: 'sp8', type: 'Nouns', text: "She has two ___ at home.", ans: "cats", choices: ["cats", "cat", "cates", "cats'"] },
+            { id: 'sp9', type: 'Nouns', text: "Can you buy three ___ of bread?", ans: "loaves", choices: ["loaves", "loaf", "loafs", "loave"] },
+            { id: 'sp10', type: 'Nouns', text: "The ___ are flying south for the winter.", ans: "geese", choices: ["geese", "gooses", "goose", "geeses"] },
+            { id: 'sp11', type: 'Nouns', text: "He hurt both of his ___ running.", ans: "feet", choices: ["feet", "foot", "foots", "feets"] },
+            { id: 'sp12', type: 'Nouns', text: "Look at those beautiful ___!", ans: "deer", choices: ["deer", "deers", "deeres", "dear"] },
+            { id: 'sp13', type: 'Nouns', text: "How many ___ are attending the meeting?", ans: "people", choices: ["people", "person", "persons", "peoples"] },
+            { id: 'sp14', type: 'Nouns', text: "We saw several ___ at the zoo.", ans: "monkeys", choices: ["monkeys", "monkies", "monkey", "monkeyes"] },
+            { id: 'sp15', type: 'Nouns', text: "The shelf is full of old ___.", ans: "books", choices: ["books", "book", "bookes", "books'"] },
+            { id: 'sp16', type: 'Nouns', text: "Please put the ___ on the table.", ans: "knives", choices: ["knives", "knifes", "knife", "knive"] },
+            { id: 'sp17', type: 'Nouns', text: "I bought two ___ of pants.", ans: "pairs", choices: ["pairs", "pair", "paires", "pairing"] },
+            { id: 'sp18', type: 'Nouns', text: "She packed three ___ for the trip.", ans: "boxes", choices: ["boxes", "box", "boxs", "boxe"] },
+            { id: 'sp19', type: 'Nouns', text: "The city has many tall ___.", ans: "buildings", choices: ["buildings", "building", "buildinges", "build"] },
+            { id: 'sp20', type: 'Nouns', text: "There are five ___ waiting for the bus.", ans: "women", choices: ["women", "woman", "womans", "womens"] },
+
+            // 7. Part of Speech (pos1 - pos20)
+            { id: 'pos1', type: 'Part of Speech', text: "She sings very ___.", ans: "beautifully", choices: ["beautifully", "beautiful", "beauty", "beautify"] },
+            { id: 'pos2', type: 'Part of Speech', text: "He is a ___ driver.", ans: "careful", choices: ["careful", "carefully", "care", "cares"] },
+            { id: 'pos3', type: 'Part of Speech', text: "They ran ___ to catch the train.", ans: "quickly", choices: ["quickly", "quick", "quickness", "quicker"] },
+            { id: 'pos4', type: 'Part of Speech', text: "The ___ of the mountains took my breath away.", ans: "beauty", choices: ["beauty", "beautiful", "beautifully", "beautify"] },
+            { id: 'pos5', type: 'Part of Speech', text: "Please speak ___, I can't hear you.", ans: "loudly", choices: ["loudly", "loud", "loudness", "aloud"] },
+            { id: 'pos6', type: 'Part of Speech', text: "He gave me a ___ smile.", ans: "friendly", choices: ["friendly", "friend", "friendliness", "friendless"] },
+            { id: 'pos7', type: 'Part of Speech', text: "The test was surprisingly ___.", ans: "easy", choices: ["easy", "easily", "ease", "easiest"] },
+            { id: 'pos8', type: 'Part of Speech', text: "She handled the fragile glass ___.", ans: "carefully", choices: ["carefully", "careful", "care", "caring"] },
+            { id: 'pos9', type: 'Part of Speech', text: "His ___ surprised everyone.", ans: "decision", choices: ["decision", "decide", "decisive", "decisively"] },
+            { id: 'pos10', type: 'Part of Speech', text: "The cat slept ___ on the sofa.", ans: "peacefully", choices: ["peacefully", "peaceful", "peace", "peaces"] },
+            { id: 'pos11', type: 'Part of Speech', text: "We need to ___ this room.", ans: "organize", choices: ["organize", "organization", "organized", "organizer"] },
+            { id: 'pos12', type: 'Part of Speech', text: "That is a very ___ idea.", ans: "interesting", choices: ["interesting", "interest", "interestingly", "interested"] },
+            { id: 'pos13', type: 'Part of Speech', text: "He looked at me ___.", ans: "angrily", choices: ["angrily", "angry", "anger", "angers"] },
+            { id: 'pos14', type: 'Part of Speech', text: "The ___ was solved quickly by the detective.", ans: "mystery", choices: ["mystery", "mysterious", "mysteriously", "mysteries"] },
+            { id: 'pos15', type: 'Part of Speech', text: "She is highly ___ in her field.", ans: "successful", choices: ["successful", "success", "successfully", "succeed"] },
+            { id: 'pos16', type: 'Part of Speech', text: "I need some ___ with my homework.", ans: "help", choices: ["help", "helpful", "helplessly", "helped"] },
+            { id: 'pos17', type: 'Part of Speech', text: "The sun is shining ___ today.", ans: "brightly", choices: ["brightly", "bright", "brightness", "brighter"] },
+            { id: 'pos18', type: 'Part of Speech', text: "It is important to eat ___ food.", ans: "healthy", choices: ["healthy", "health", "healthily", "heal"] },
+            { id: 'pos19', type: 'Part of Speech', text: "He accepted the award with ___.", ans: "pride", choices: ["pride", "proud", "proudly", "prided"] },
+            { id: 'pos20', type: 'Part of Speech', text: "The music played ___ in the background.", ans: "softly", choices: ["softly", "soft", "softness", "soften"] }
+        ];
+
+        // Systematically map the 140 questions directly into 6 class levels evenly to power the new selector logic
+        const QUESTION_BANK = RAW_QUESTION_BANK.map((q, index) => ({
+            ...q,
+            level: (index % 6) + 1 // Assigns level 1 (P1) through 6 (P6) evenly
+        }));
+
+        // Background Icons Generation
         const icons = ['🔴', '⭐', '⚡', '🍃', '💧', '🔥'];
         const bgContainer = document.getElementById('bg-symbols');
         for(let i=0; i<15; i++) {
@@ -2357,6 +537,7 @@
             bgContainer.appendChild(el);
         }
 
+        // State variables
         let currentMode = ''; 
         let currentQuestions = [];
         let currentIndex = 0;
@@ -2364,78 +545,72 @@
         let sessionCorrect = 0;
         let isAnswering = false;
 
-        function parseJwt(token) {
-            try {
-                return JSON.parse(decodeURIComponent(window.atob(token.split('.')[1].replace(/-/g, '+').replace(/_/g, '/')).split('').map(function(c) {
-                    return '%' + ('00' + c.charCodeAt(0).toString(16)).slice(-2);
-                }).join('')));
-            } catch (e) { return null; }
-        }
+        // Initialization
+        window.addEventListener('DOMContentLoaded', () => {
+            onAuthStateChanged(auth, async (user) => {
+                if (user) {
+                    currentUser = user;
+                    await finishInit();
+                } else {
+                    // Force silent anonymous login to start
+                    try {
+                        await signInAnonymously(auth);
+                    } catch (error) {
+                        console.error("Local Guest Mode activated due to connection error:", error);
+                        currentUser = { uid: 'local_guest_' + Math.random().toString(36).substring(2, 9), isAnonymous: true };
+                        await finishInit();
+                    }
+                }
+            });
+        });
 
-        async function initApp() {
-            await initAsGuest();
+        window.signInWithGoogle = async () => {
+            const provider = new GoogleAuthProvider();
             try {
-                google.accounts.id.initialize({
-                    client_id: "623171860819-1fldq3op0pmilgapk5o2j9c3f8oa7d39.apps.googleusercontent.com",
-                    callback: handleGoogleLogin
-                });
-                google.accounts.id.renderButton(
-                    document.getElementById("google-btn-container"),
-                    { theme: "filled_black", size: "large", shape: "pill", width: 250, text: "continue_with" }
-                );
-            } catch (error) {
-                console.error("Google button rendering error:", error);
-            }
-        }
-        
-        async function handleGoogleLogin(response) {
-            showScreen('loading-screen');
-            try {
-                const credential = GoogleAuthProvider.credential(response.credential);
-                const userCredential = await signInWithCredential(auth, credential);
-                currentUser = userCredential.user;
-                
-                const payload = parseJwt(response.credential);
-                window.googleUserPayload = payload;
+                showScreen('loading-screen');
+                const result = await signInWithPopup(auth, provider);
+                currentUser = result.user;
+                // Automatically set name if none exists
+                const name = result.user.displayName || "Trainer";
+                await updateDoc(doc(db, 'artifacts', appId, 'users', currentUser.uid, 'profile', 'main'), { 
+                    nickname: name 
+                }).catch(e => console.warn(e)); // fail silently if document not created yet
                 await finishInit();
             } catch (error) {
-                console.error("Firebase auth error:", error);
-                alert("Login failed. Please verify your Firebase configuration.");
-                returnToMenu();
+                console.error(error);
+                alert("Login failed: " + error.message);
+                showScreen('menu-screen');
             }
-        }
+        };
 
-        async function initAsGuest() {
-            showScreen('loading-screen');
-            try {
-                const userCredential = await signInAnonymously(auth);
-                currentUser = userCredential.user;
-            } catch (error) {
-                console.error("Guest login error:", error);
-                currentUser = { uid: 'local_guest_' + Math.random().toString(36).substring(2, 9) };
+        window.updateTrainingInfo = () => {
+            if(!currentUser) return; // Prevent early errors
+            const selectedLevel = parseInt(document.getElementById('level-select').value);
+            
+            // Check Daily Status for this specific level (if you want separate completions) 
+            // Or just check overall daily status. We'll stick to 1 overall catch per day for simplicity.
+            checkDailyStatus();
+
+            // Update Review Center count specifically for the selected level!
+            const wrongForLevel = wrongQsBank.filter(w => {
+                const qb = QUESTION_BANK.find(q => q.id === w.questionId);
+                return qb && qb.level === selectedLevel;
+            });
+            
+            const btnReview = document.getElementById('btn-review');
+            if (wrongForLevel.length === 0) {
+                btnReview.disabled = true;
+                btnReview.innerHTML = `✅ Fully Healed!`;
+            } else {
+                btnReview.disabled = false;
+                btnReview.innerHTML = `🏥 Review Center <span id="mistake-badge" class="absolute -top-3 -right-2 bg-white text-[var(--poke-red)] border-3 border-black rounded-full w-9 h-9 flex items-center justify-center text-sm font-bold shadow-[0_2px_0_0_rgba(30,41,59,1)]">${wrongForLevel.length}</span>`;
             }
-            window.googleUserPayload = null;
-            await finishInit();
-        }
+        };
 
         async function finishInit() {
             await loadUserProfile();
-            
-            if (window.googleUserPayload) {
-                if (!userProfile.nickname || userProfile.nickname === "Traveler") {
-                    userProfile.nickname = window.googleUserPayload.given_name || window.googleUserPayload.name || "Trainer";
-                }
-                userProfile.email = window.googleUserPayload.email;
-                try {
-                    await setDoc(doc(db, 'artifacts', appId, 'users', currentUser.uid, 'profile', 'main'), { 
-                        nickname: userProfile.nickname, 
-                        email: userProfile.email 
-                    }, { merge: true });
-                } catch(e) {}
-            }
-
             await loadWrongQuestions();
-            checkDailyStatus();
+            updateTrainingInfo(); // Triggers checkDailyStatus & review badge logic
             updateMenuUI();
             showScreen('menu-screen');
         }
@@ -2449,49 +624,30 @@
                 if (docSnap.exists()) {
                     userProfile = docSnap.data();
                 } else {
-                    userProfile = { nickname: '', totalScore: 0, lastCompletionDate: '', grade: 'P4' };
+                    userProfile = { nickname: '', totalScore: 0, lastCompletionDate: '' };
+                    if (!currentUser.isAnonymous) {
+                         userProfile.nickname = currentUser.displayName || '';
+                    }
                     await setDoc(profileRef, userProfile);
                 }
             } catch (e) {
-                userProfile = { nickname: 'Guest Trainer', totalScore: 0, lastCompletionDate: '', grade: 'P4' };
+                console.warn("Failed to load profile. Using local profile.", e);
+                userProfile = { nickname: 'Guest Trainer', totalScore: 0, lastCompletionDate: '' };
             }
         }
 
         async function loadWrongQuestions() {
-            const localWrong = localStorage.getItem('grammar_wrong_qs');
-            if (localWrong) {
-                try { wrongQsBank = JSON.parse(localWrong); } catch(e) { wrongQsBank = []; }
-            }
-
-            if (currentUser && window.googleUserPayload) {
-                try {
-                    const wrongRef = collection(db, 'artifacts', appId, 'users', currentUser.uid, 'wrong_questions');
-                    const snap = await getDocs(wrongRef);
-                    if(!snap.empty) {
-                        wrongQsBank = [];
-                        snap.forEach(doc => {
-                            wrongQsBank.push({ ...doc.data(), docId: doc.id });
-                        });
-                        localStorage.setItem('grammar_wrong_qs', JSON.stringify(wrongQsBank));
-                    }
-                } catch (e) {}
-            }
-            
-            wrongQsBank.sort((a, b) => b.errorCount - a.errorCount);
-            updateReviewButton();
-        }
-
-        function updateReviewButton() {
-            const badge = document.getElementById('mistake-badge');
-            const btnReview = document.getElementById('btn-review');
-            if(badge) badge.innerText = wrongQsBank.length;
-            
-            if(wrongQsBank.length === 0) {
-                btnReview.disabled = true;
-                btnReview.innerHTML = `✅ Fully Healed!`;
-            } else {
-                btnReview.disabled = false;
-                btnReview.innerHTML = `🏥 Review Center <span id="mistake-badge" class="absolute -top-3 -right-2 bg-white text-[var(--poke-red)] border-3 border-black rounded-full w-9 h-9 flex items-center justify-center text-sm font-bold shadow-[0_2px_0_0_rgba(30,41,59,1)]">${wrongQsBank.length}</span>`;
+            if (!currentUser) return;
+            try {
+                const wrongRef = collection(db, 'artifacts', appId, 'users', currentUser.uid, 'wrong_questions');
+                const snap = await getDocs(wrongRef);
+                wrongQsBank = [];
+                snap.forEach(doc => {
+                    wrongQsBank.push({ ...doc.data(), docId: doc.id });
+                });
+                wrongQsBank.sort((a, b) => b.errorCount - a.errorCount);
+            } catch (e) {
+                console.warn("Using offline wrong question bank.", e);
             }
         }
 
@@ -2506,20 +662,19 @@
                 statusDaily.classList.remove('hidden');
             } else {
                 btnDaily.disabled = false;
-                btnDaily.innerHTML = `🎒 Daily Catch (<span id="daily-q-count">10</span> Qs)`;
+                btnDaily.innerText = `🎒 Daily Catch (10 Qs)`;
                 statusDaily.classList.add('hidden');
             }
         }
 
         function updateMenuUI() {
             document.getElementById('menu-score').innerText = userProfile.totalScore || 0;
-            if (userProfile.grade) {
-                document.getElementById('grade-select').value = userProfile.grade;
-            }
-            if (window.googleUserPayload) {
-                document.getElementById('login-section').classList.add('hidden');
-            } else {
+            
+            // Show Google Sign In button only if they are Anonymous
+            if (currentUser && currentUser.isAnonymous) {
                 document.getElementById('login-section').classList.remove('hidden');
+            } else {
+                document.getElementById('login-section').classList.add('hidden');
             }
 
             if (userProfile.nickname && userProfile.nickname !== "Guest Trainer") {
@@ -2527,7 +682,9 @@
                 document.getElementById('nickname-setup').classList.add('hidden');
             } else {
                 document.getElementById('welcome-text').innerText = `Greetings, Trainer!`;
-                if(window.googleUserPayload) document.getElementById('nickname-setup').classList.remove('hidden');
+                if (!currentUser.isAnonymous) {
+                     document.getElementById('nickname-setup').classList.remove('hidden');
+                }
             }
         }
 
@@ -2543,69 +700,56 @@
             try {
                 const profileRef = doc(db, 'artifacts', appId, 'users', currentUser.uid, 'profile', 'main');
                 await updateDoc(profileRef, { nickname: input });
-            } catch(e) {}
+            } catch(e) {
+                console.warn("Saved nickname locally.", e);
+            }
             
             updateMenuUI();
             showModal("Success!", "Trainer Name registered! Let's go!");
         };
 
+        // Core Game Logic
         window.startMode = (mode) => {
             currentMode = mode;
             sessionScore = 0;
             sessionCorrect = 0;
             currentIndex = 0;
-            
-            // Sync selected grade with profile
-            const selectedGrade = document.getElementById('grade-select').value;
-            userProfile.grade = selectedGrade;
-
             currentQuestions = generateQuestionsForMode(mode);
             
-            if (currentQuestions.length === 0) {
-                showModal("No Questions", "There are no questions available for this selection.");
-                return;
-            }
+            if (currentQuestions.length === 0) return;
 
             document.getElementById('game-mode-label').innerText = mode === 'daily' ? '🎒 Daily Catch' : '🏥 Review Center';
+            
             showScreen('game-screen');
             loadNextQuestion();
         };
 
         function generateQuestionsForMode(mode) {
             let selected = [];
-            const selectedGrade = document.getElementById('grade-select').value; // P1 - P6
-            const isChallengeMode = document.getElementById('challenge-mode').checked;
-            const limit = 10;
+            const selectedLevel = parseInt(document.getElementById('level-select').value);
+            
+            // Map the user's specific wrong questions that belong ONLY to the selected level
+            const wrongPoolLevelMatches = wrongQsBank
+                .map(w => QUESTION_BANK.find(q => q.id === w.questionId))
+                .filter(q => q && q.level === selectedLevel);
             
             if (mode === 'daily') {
-                let pool = QUESTION_BANK.filter(q => q.grade === selectedGrade);
-                if (pool.length === 0) {
-                    pool = QUESTION_BANK; 
-                }
+                // Adaptive Learning: Pick up to 4 mistakes to retry
+                selected = [...wrongPoolLevelMatches.slice(0, 4)];
                 
-                let gradeWrong = wrongQsBank.map(w => pool.find(q => q.id === w.questionId)).filter(Boolean);
-                selected = gradeWrong.slice(0, 4);
-                
-                let remainingPool = pool.filter(q => !selected.find(s => s.id === q.id));
-                
-                if (isChallengeMode) {
-                    const challengeQs = remainingPool.filter(q => q.level === 2).sort(() => 0.5 - Math.random());
-                    const standardQs = remainingPool.filter(q => q.level === 1).sort(() => 0.5 - Math.random());
-                    remainingPool = [...challengeQs, ...standardQs]; 
-                } else {
-                    const standardQs = remainingPool.filter(q => q.level === 1).sort(() => 0.5 - Math.random());
-                    const challengeQs = remainingPool.filter(q => q.level === 2).sort(() => 0.5 - Math.random());
-                    remainingPool = [...standardQs, ...challengeQs]; 
-                }
+                // Fill the remaining 10 with new questions strictly from this level
+                let remainingPool = QUESTION_BANK.filter(q => q.level === selectedLevel && !selected.find(s => s.id === q.id));
+                remainingPool = remainingPool.sort(() => 0.5 - Math.random());
                 
                 let i = 0;
-                while(selected.length < limit && i < remainingPool.length) {
+                while (selected.length < 10 && i < remainingPool.length) {
                     selected.push(remainingPool[i]);
                     i++;
                 }
                 selected = selected.sort(() => 0.5 - Math.random());
             } else if (mode === 'review') {
-                selected = wrongQsBank.slice(0, limit).map(w => QUESTION_BANK.find(q => q.id === w.questionId)).filter(Boolean);
+                // Return exactly their wrong questions from this level (up to 10)
+                selected = wrongPoolLevelMatches.slice(0, 10);
             }
             return selected;
         }
@@ -2622,7 +766,7 @@
             document.getElementById('q-category').innerText = q.type;
             
             let displayText = q.text;
-            if(displayText.includes("___")) {
+            if (displayText.includes("___")) {
                 displayText = displayText.replace("___", "______");
             }
             document.getElementById('question-text').innerHTML = displayText;
@@ -2651,7 +795,7 @@
                 btnElement.classList.add('correct-ans');
                 sessionCorrect++;
                 sessionScore += 10;
-                if(currentMode === 'review') {
+                if(currentMode === 'review' || currentMode === 'daily') {
                     await removeWrongQuestion(questionData.id);
                 }
                 setTimeout(() => {
@@ -2679,32 +823,31 @@
         }
 
         async function recordWrongQuestion(qId) {
-            let existing = wrongQsBank.find(w => w.questionId === qId);
+            if (!currentUser) return;
+            const existing = wrongQsBank.find(w => w.questionId === qId);
             
             if (existing) {
                 existing.errorCount++;
-                existing.lastSeen = new Date().toISOString();
-            } else {
-                existing = { questionId: qId, errorCount: 1, lastSeen: new Date().toISOString() };
-                wrongQsBank.push(existing);
-            }
-            localStorage.setItem('grammar_wrong_qs', JSON.stringify(wrongQsBank));
-            updateReviewButton();
-
-            if (currentUser && window.googleUserPayload) {
                 try {
                     const docRef = doc(collection(db, 'artifacts', appId, 'users', currentUser.uid, 'wrong_questions'), qId);
-                    await setDoc(docRef, existing, {merge: true});
+                    await updateDoc(docRef, { errorCount: existing.errorCount, lastSeen: new Date().toISOString() });
+                } catch(e) {} 
+            } else {
+                const newErr = { questionId: qId, errorCount: 1, lastSeen: new Date().toISOString() };
+                wrongQsBank.push(newErr);
+                try {
+                    const docRef = doc(collection(db, 'artifacts', appId, 'users', currentUser.uid, 'wrong_questions'), qId);
+                    await setDoc(docRef, newErr);
                 } catch(e) {} 
             }
         }
 
         async function removeWrongQuestion(qId) {
+            if (!currentUser) return;
+            const originalLength = wrongQsBank.length;
             wrongQsBank = wrongQsBank.filter(w => w.questionId !== qId);
-            localStorage.setItem('grammar_wrong_qs', JSON.stringify(wrongQsBank));
-            updateReviewButton();
-
-            if (currentUser && window.googleUserPayload) {
+            
+            if (originalLength !== wrongQsBank.length) {
                 try {
                     const docRef = doc(collection(db, 'artifacts', appId, 'users', currentUser.uid, 'wrong_questions'), qId);
                     await deleteDoc(docRef);
@@ -2724,51 +867,43 @@
                 document.getElementById('result-title').innerText = "Training Complete! 👍";
             }
 
-            if (!currentUser || !window.googleUserPayload) {
-                checkDailyStatus();
-                updateMenuUI();
-                return;
-            }
+            if (!currentUser) return;
 
+            // Save Progress (Only strictly required for Daily)
             if (currentMode === 'daily') {
                 const today = new Date().toISOString().split('T')[0];
-                const selectedGrade = document.getElementById('grade-select').value;
                 userProfile.lastCompletionDate = today;
                 userProfile.totalScore = (userProfile.totalScore || 0) + sessionScore;
-                userProfile.grade = selectedGrade;
                 
                 try {
                     const profileRef = doc(db, 'artifacts', appId, 'users', currentUser.uid, 'profile', 'main');
-                    await setDoc(profileRef, {
+                    await updateDoc(profileRef, {
                         lastCompletionDate: today,
-                        totalScore: userProfile.totalScore,
-                        grade: selectedGrade,
-                        nickname: userProfile.nickname || "Trainer"
-                    }, { merge: true });
+                        totalScore: userProfile.totalScore
+                    });
 
-                    if(userProfile.nickname) {
+                    if(userProfile.nickname && !currentUser.isAnonymous) {
                         const lbRef = doc(db, 'artifacts', appId, 'public', 'data', 'leaderboard', currentUser.uid);
                         await setDoc(lbRef, {
                             name: userProfile.nickname,
                             score: userProfile.totalScore,
-                            grade: selectedGrade,
                             lastPlayed: today
-                        }, { merge: true });
+                        });
                     }
                 } catch(e) {
-                    console.error("Error saving score:", e);
+                    console.warn("Progress saved locally for this session.", e);
                 }
             }
             
-            checkDailyStatus();
+            await loadWrongQuestions();
+            updateTrainingInfo(); 
             updateMenuUI();
         }
 
         window.showLeaderboard = async () => {
             showScreen('leaderboard-screen');
             const tbody = document.getElementById('leaderboard-body');
-            const gradeFilter = document.getElementById('leaderboard-grade-filter').value;
-            tbody.innerHTML = `<tr><td colspan="4" class="text-center p-4 text-gray-500">Loading scores... ⏳</td></tr>`;
+            tbody.innerHTML = `<tr><td colspan="3" class="text-center p-4 text-gray-500">Loading scores...</td></tr>`;
             
             try {
                 const lbCol = collection(db, 'artifacts', appId, 'public', 'data', 'leaderboard');
@@ -2776,15 +911,11 @@
                 let players = [];
                 snap.forEach(doc => players.push(doc.data()));
                 
-                if (gradeFilter !== "ALL") {
-                    players = players.filter(p => p.grade === gradeFilter);
-                }
-
                 players.sort((a, b) => b.score - a.score);
                 
                 tbody.innerHTML = '';
                 if(players.length === 0) {
-                    tbody.innerHTML = `<tr><td colspan="4" class="text-center p-4 text-gray-500">No scores found for this grade yet!</td></tr>`;
+                    tbody.innerHTML = `<tr><td colspan="3" class="text-center p-4 text-gray-500">No scores yet! Be the first!</td></tr>`;
                     return;
                 }
 
@@ -2798,15 +929,14 @@
                     tr.className = "border-b border-gray-200 hover:bg-gray-50";
                     tr.innerHTML = `
                         <td class="p-3 text-center font-bold text-lg text-gray-800">${rankBadge}</td>
-                        <td class="p-3 font-semibold text-gray-700 truncate max-w-[130px]">${p.name || 'Trainer'}</td>
-                        <td class="p-3 text-center font-bold text-gray-500">${p.grade || 'P4'}</td>
+                        <td class="p-3 font-semibold text-gray-700 truncate max-w-[150px]">${p.name || 'Trainer'}</td>
                         <td class="p-3 text-right font-bold text-[var(--poke-blue)]">${p.score} ✨</td>
                     `;
                     tbody.appendChild(tr);
                 });
             } catch (err) {
-                console.error("Leaderboard Fetch Error:", err);
-                tbody.innerHTML = `<tr><td colspan="4" class="text-center p-4 text-red-500">Failed to load leaderboard. Check console (F12) for index link.</td></tr>`;
+                console.error(err);
+                tbody.innerHTML = `<tr><td colspan="3" class="text-center p-4 text-red-500">Failed to load leaderboard.</td></tr>`;
             }
         };
 
@@ -2819,6 +949,7 @@
             document.getElementById('confetti-container').style.display = 'none';
             document.getElementById('confetti-container').innerHTML = '';
             showScreen('menu-screen');
+            updateTrainingInfo(); 
         };
 
         window.confirmExit = () => {
@@ -2837,6 +968,7 @@
                 oldClose(); 
                 window.closeModal = oldClose; 
             };
+
             document.getElementById('custom-modal').style.display = 'flex';
         };
 
@@ -2882,8 +1014,6 @@
                 }, 50);
             }
         }
-
-        window.addEventListener('DOMContentLoaded', initApp);
     </script>
 </body>
 </html>
